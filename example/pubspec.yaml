@@ -1,0 +1,13 @@
+name: appcraft_phone_util_flutter_example
+description: Example app for appcraft_phone_util_flutter
+publish_to: 'none'
+version: 1.0.0
+
+environment:
+  sdk: '>=2.14.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  appcraft_phone_util_flutter:
+    path: ../
