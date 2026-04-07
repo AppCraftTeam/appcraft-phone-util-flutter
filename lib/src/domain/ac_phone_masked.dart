@@ -1,7 +1,11 @@
-class PhoneMasked {
-  PhoneMasked._(this.maskedPhone);
+/// Applies a mask pattern to a raw phone number string.
+class ACPhoneMasked {
+  ACPhoneMasked._(this.maskedPhone);
 
-  factory PhoneMasked.setMask(
+  /// Creates an [ACPhoneMasked] by applying [mask] to [rawPhone].
+  ///
+  /// The '#' characters in [mask] are replaced with digits from [rawPhone].
+  factory ACPhoneMasked.setMask(
     String mask,
     { required String rawPhone }
   ) {
@@ -22,8 +26,9 @@ class PhoneMasked {
       }
     }
 
-    return PhoneMasked._(result.toString());
+    return ACPhoneMasked._(result.toString());
   }
 
+  /// The resulting masked phone number string.
   final String maskedPhone;
 }

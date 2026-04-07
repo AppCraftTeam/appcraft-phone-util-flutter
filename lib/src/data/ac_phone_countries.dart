@@ -1,8 +1,9 @@
-import '../domain/phone_country.dart';
+import '../domain/ac_phone_country.dart';
 
-class PhoneCountries {
-  PhoneCountries._() {
-    final result = <String, PhoneCountry>{};
+/// Singleton registry of all phone countries with hashed lookup by phone code.
+class ACPhoneCountries {
+  ACPhoneCountries._() {
+    final result = <String, ACPhoneCountry>{};
 
     for (final country in all) {
       final potentialPhoneCodes = country.potentialPhoneCodes;
@@ -15,19 +16,22 @@ class PhoneCountries {
     hashedCountries = result;
   }
 
-  static final instance = PhoneCountries._();
+  /// The shared singleton instance of [ACPhoneCountries].
+  static final instance = ACPhoneCountries._();
 
-  late final Map<String, PhoneCountry> hashedCountries;
+  /// A map of phone code digits to [ACPhoneCountry] for fast lookup.
+  late final Map<String, ACPhoneCountry> hashedCountries;
 
-  final List<PhoneCountry> all = const [
-    PhoneCountry(
+  /// The complete list of all known phone countries.
+  final List<ACPhoneCountry> all = const [
+    ACPhoneCountry(
       name: 'United States of America',
       isoCode: 'US',
       phoneCode: '+1',
       mask: '+# (###) ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Northern Mariana Islands',
       isoCode: 'MP',
       phoneCode: '+1',
@@ -36,7 +40,7 @@ class PhoneCountries {
         '+1 (670)'
       ],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'American Samoa',
       isoCode: 'AS',
       phoneCode: '+1',
@@ -45,7 +49,7 @@ class PhoneCountries {
         '+1 (684)'
       ],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Anguilla',
       isoCode: 'AI',
       phoneCode: '+1',
@@ -54,7 +58,7 @@ class PhoneCountries {
         '+1 (264)'
       ],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Antigua and Barbuda',
       isoCode: 'AG',
       phoneCode: '+1',
@@ -63,7 +67,7 @@ class PhoneCountries {
         '+1 (268)'
       ],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Virgin Islands, British',
       isoCode: 'VG',
       phoneCode: '+1',
@@ -72,7 +76,7 @@ class PhoneCountries {
         '+1 (284)'
       ],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Bahamas',
       isoCode: 'BS',
       phoneCode: '+1',
@@ -81,7 +85,7 @@ class PhoneCountries {
         '+1 (242)'
       ],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Barbados',
       isoCode: 'BB',
       phoneCode: '+1',
@@ -90,7 +94,7 @@ class PhoneCountries {
         '+1 (246)'
       ],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Trinidad and Tobago',
       isoCode: 'TT',
       phoneCode: '+1',
@@ -99,7 +103,7 @@ class PhoneCountries {
         '+1 (868)'
       ],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Bermuda',
       isoCode: 'BM',
       phoneCode: '+1',
@@ -108,7 +112,7 @@ class PhoneCountries {
         '+1 (441)'
       ],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Canada',
       isoCode: 'CA',
       phoneCode: '+1',
@@ -126,7 +130,7 @@ class PhoneCountries {
         '+1 (867)',
       ],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Cayman Islands',
       isoCode: 'KY',
       phoneCode: '+1',
@@ -135,7 +139,7 @@ class PhoneCountries {
         '+1 (345)'
       ],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Saint Vincent and the Grenadines',
       isoCode: 'VC',
       phoneCode: '+1',
@@ -144,7 +148,7 @@ class PhoneCountries {
         '+1 (784)'
       ],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Saint Lucia',
       isoCode: 'LC',
       phoneCode: '+1',
@@ -153,7 +157,7 @@ class PhoneCountries {
         '+1 (758)'
       ],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Grenada',
       isoCode: 'GD',
       phoneCode: '+1',
@@ -162,7 +166,7 @@ class PhoneCountries {
         '+1 (473)'
       ],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Guam',
       isoCode: 'GU',
       phoneCode: '+1',
@@ -171,7 +175,7 @@ class PhoneCountries {
         '+1 (671)'
       ],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Saint Kitts and Nevis',
       isoCode: 'KN',
       phoneCode: '+1',
@@ -180,7 +184,7 @@ class PhoneCountries {
         '+1 (869)'
       ],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Jamaica',
       isoCode: 'JM',
       phoneCode: '+1',
@@ -189,7 +193,7 @@ class PhoneCountries {
         '+1 (876)'
       ],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Virgin Islands, U.S.',
       isoCode: 'VI',
       phoneCode: '+1',
@@ -198,7 +202,7 @@ class PhoneCountries {
         '+1 (340)'
       ],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Montserrat',
       isoCode: 'MS',
       phoneCode: '+1',
@@ -207,7 +211,7 @@ class PhoneCountries {
         '+1 (664)'
       ],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Turks and Caicos Islands',
       isoCode: 'TC',
       phoneCode: '+1',
@@ -216,7 +220,7 @@ class PhoneCountries {
         '+1 (649)'
       ],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Russian Federation',
       isoCode: 'RU',
       phoneCode: '+7',
@@ -230,7 +234,7 @@ class PhoneCountries {
         '+8 (49',
       ],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Kazakhstan',
       isoCode: 'KZ',
       phoneCode: '+7',
@@ -241,98 +245,98 @@ class PhoneCountries {
         '+7 (6',
       ],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Egypt',
       isoCode: 'EG',
       phoneCode: '+20',
       mask: '+## ### ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'South Africa',
       isoCode: 'ZA',
       phoneCode: '+27',
       mask: '+## ## ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Greece',
       isoCode: 'GR',
       phoneCode: '+30',
       mask: '+## # ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Netherlands',
       isoCode: 'NL',
       phoneCode: '+31',
       mask: '+## ## ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Belgium',
       isoCode: 'BE',
       phoneCode: '+32',
       mask: '+## ### ## ## ##',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'France',
       isoCode: 'FR',
       phoneCode: '+33',
       mask: '+## # ## ## ## ##',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Spain',
       isoCode: 'ES',
       phoneCode: '+34',
       mask: '+## ### ### ###',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Hungary',
       isoCode: 'HU',
       phoneCode: '+36',
       mask: '+## # ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Italy',
       isoCode: 'IT',
       phoneCode: '+39',
       mask: '+## ## ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Romania',
       isoCode: 'RO',
       phoneCode: '+40',
       mask: '+## ### ### ###',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Switzerland',
       isoCode: 'CH',
       phoneCode: '+41',
       mask: '+## ## ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Austria',
       isoCode: 'AT',
       phoneCode: '+43',
       mask: '+## ### ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'United Kingdom',
       isoCode: 'GB',
       phoneCode: '+44',
       mask: '+## #### ######',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Guernsey',
       isoCode: 'GG',
       phoneCode: '+44',
@@ -345,112 +349,112 @@ class PhoneCountries {
         '+44 7937',
       ],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Denmark',
       isoCode: 'DK',
       phoneCode: '+45',
       mask: '+## # ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Sweden',
       isoCode: 'SE',
       phoneCode: '+46',
       mask: '+## ## ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Norway',
       isoCode: 'NO',
       phoneCode: '+47',
       mask: '+## #### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Poland',
       isoCode: 'PL',
       phoneCode: '+48',
       mask: '+## ## ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Germany',
       isoCode: 'DE',
       phoneCode: '+49',
       mask: '+## ## #########',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Peru',
       isoCode: 'PE',
       phoneCode: '+51',
       mask: '+## ## #########',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Mexico',
       isoCode: 'MX',
       phoneCode: '+52',
       mask: '+## ### ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Cuba',
       isoCode: 'CU',
       phoneCode: '+53',
       mask: '+## ### ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Argentina',
       isoCode: 'AR',
       phoneCode: '+54',
       mask: '+## # ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Brazil',
       isoCode: 'BR',
       phoneCode: '+55',
       mask: '+## (##) ####-####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Chile',
       isoCode: 'CL',
       phoneCode: '+56',
       mask: '+## ## ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Colombia',
       isoCode: 'CO',
       phoneCode: '+57',
       mask: '+## ### ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Venezuela, Bolivarian Republic of',
       isoCode: 'VE',
       phoneCode: '+58',
       mask: '+## ### ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Malaysia',
       isoCode: 'MY',
       phoneCode: '+60',
       mask: '+## # ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Australia',
       isoCode: 'AU',
       phoneCode: '+61',
       mask: '+## #### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Christmas Island',
       isoCode: 'CX',
       phoneCode: '+61',
@@ -459,434 +463,434 @@ class PhoneCountries {
         '+61 8 9164'
       ],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Indonesia',
       isoCode: 'ID',
       phoneCode: '+62',
       mask: '+## ## #### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Philippines',
       isoCode: 'PH',
       phoneCode: '+63',
       mask: '+## ## ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'New Zealand',
       isoCode: 'NZ',
       phoneCode: '+64',
       mask: '+## (#) ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Singapore',
       isoCode: 'SG',
       phoneCode: '+65',
       mask: '+## #### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Thailand',
       isoCode: 'TH',
       phoneCode: '+66',
       mask: '+## # ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Japan',
       isoCode: 'JP',
       phoneCode: '+81',
       mask: '+## ## ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Korea, Republic of',
       isoCode: 'KR',
       phoneCode: '+82',
       mask: '+## # ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Vietnam',
       isoCode: 'VN',
       phoneCode: '+84',
       mask: '+## ### ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'China',
       isoCode: 'CN',
       phoneCode: '+86',
       mask: '+## ### #### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Turkey',
       isoCode: 'TR',
       phoneCode: '+90',
       mask: '+## ### ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'India',
       isoCode: 'IN',
       phoneCode: '+91',
       mask: '+## ### ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Pakistan',
       isoCode: 'PK',
       phoneCode: '+92',
       mask: '+## ### #######',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Afghanistan',
       isoCode: 'AF',
       phoneCode: '+93',
       mask: '+## ## ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Sri Lanka',
       isoCode: 'LK',
       phoneCode: '+94',
       mask: '+## ## ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Myanmar',
       isoCode: 'MM',
       phoneCode: '+95',
       mask: '+## ## ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Iran, Islamic Republic of',
       isoCode: 'IR',
       phoneCode: '+98',
       mask: '+## ### ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'South Sudan',
       isoCode: 'SS',
       phoneCode: '+211',
       mask: '+### #### #####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Morocco',
       isoCode: 'MA',
       phoneCode: '+212',
       mask: '+### ## ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Algeria',
       isoCode: 'DZ',
       phoneCode: '+213',
       mask: '+### # ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Tunisia',
       isoCode: 'TN',
       phoneCode: '+216',
       mask: '+### #### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Libyan Arab Jamahiriya',
       isoCode: 'LY',
       phoneCode: '+218',
       mask: '+### ## ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Gambia',
       isoCode: 'GM',
       phoneCode: '+220',
       mask: '+### ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Senegal',
       isoCode: 'SN',
       phoneCode: '+221',
       mask: '+### ## ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Mauritania',
       isoCode: 'MR',
       phoneCode: '+222',
       mask: '+### ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Mali',
       isoCode: 'ML',
       phoneCode: '+223',
       mask: '+### #### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Guinea',
       isoCode: 'GN',
       phoneCode: '+224',
       mask: '+### ### ######',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: "Cote d'Ivoire",
       isoCode: 'CI',
       phoneCode: '+225',
       mask: '+### ########',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Burkina Faso',
       isoCode: 'BF',
       phoneCode: '+226',
       mask: '+### # ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Niger',
       isoCode: 'NE',
       phoneCode: '+227',
       mask: '+### ## ######',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Togo',
       isoCode: 'TG',
       phoneCode: '+228',
       mask: '+### # ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Benin',
       isoCode: 'BJ',
       phoneCode: '+229',
       mask: '+### ### ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Mauritius',
       isoCode: 'MU',
       phoneCode: '+230',
       mask: '+### ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Liberia',
       isoCode: 'LR',
       phoneCode: '+231',
       mask: '+### ## ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Sierra Leone',
       isoCode: 'SL',
       phoneCode: '+232',
       mask: '+### ## ######',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Ghana',
       isoCode: 'GH',
       phoneCode: '+233',
       mask: '+### ## ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Nigeria',
       isoCode: 'NG',
       phoneCode: '+234',
       mask: '+### ### ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Chad',
       isoCode: 'TD',
       phoneCode: '+235',
       mask: '+### # ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Central African Republic',
       isoCode: 'CF',
       phoneCode: '+236',
       mask: '+### # ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Cameroon',
       isoCode: 'CM',
       phoneCode: '+237',
       mask: '+### # ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Cape Verde',
       isoCode: 'CV',
       phoneCode: '+238',
       mask: '+### ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Sao Tome and Principe',
       isoCode: 'ST',
       phoneCode: '+239',
       mask: '+### ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Equatorial Guinea',
       isoCode: 'GQ',
       phoneCode: '+240',
       mask: '+### ## ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Gabon',
       isoCode: 'GA',
       phoneCode: '+241',
       mask: '+### ######',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Congo',
       isoCode: 'CG',
       phoneCode: '+242',
       mask: '+### ## ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Congo, The Democratic Republic of the',
       isoCode: 'CD',
       phoneCode: '+243',
       mask: '+### ## ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Angola',
       isoCode: 'AO',
       phoneCode: '+244',
       mask: '+### #### ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Guinea-Bissau',
       isoCode: 'GW',
       phoneCode: '+245',
       mask: '+### ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'British Indian Ocean Territory',
       isoCode: 'IO',
       phoneCode: '+246',
       mask: '+### ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Seychelles',
       isoCode: 'SC',
       phoneCode: '+248',
       mask: '+### ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Sudan',
       isoCode: 'SD',
       phoneCode: '+249',
       mask: '+### ## ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Rwanda',
       isoCode: 'RW',
       phoneCode: '+250',
       mask: '### ### ###',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Ethiopia',
       isoCode: 'ET',
       phoneCode: '+251',
       mask: '+### ## ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Somalia',
       isoCode: 'SO',
       phoneCode: '+252',
       mask: '+### ## ### ###',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Djibouti',
       isoCode: 'DJ',
       phoneCode: '+253',
       mask: '+### # ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Kenya',
       isoCode: 'KE',
       phoneCode: '+254',
       mask: '+### ### ######',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Tanzania',
       isoCode: 'TZ',
       phoneCode: '+255',
       mask: '+### ## ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Uganda',
       isoCode: 'UG',
       phoneCode: '+256',
       mask: '+### ### ######',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Burundi',
       isoCode: 'BI',
       phoneCode: '+257',
       mask: '+### ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Mozambique',
       isoCode: 'MZ',
       phoneCode: '+258',
       mask: '+### ### ######',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Zambia',
       isoCode: 'ZM',
       phoneCode: '+260',
       mask: '+### ## ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Madagascar',
       isoCode: 'MG',
       phoneCode: '+261',
       mask: '+### ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Mayotte',
       isoCode: 'YT',
       phoneCode: '+262',
@@ -896,7 +900,7 @@ class PhoneCountries {
         '+262 639'
       ],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Réunion Island',
       isoCode: 'RE',
       phoneCode: '+262',
@@ -909,826 +913,826 @@ class PhoneCountries {
         '+262 976'
       ],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Zimbabwe',
       isoCode: 'ZW',
       phoneCode: '+263',
       mask: '+### ## ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Namibia',
       isoCode: 'NA',
       phoneCode: '+264',
       mask: '+### ## ######',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Malawi',
       isoCode: 'MW',
       phoneCode: '+265',
       mask: '+### #########',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Lesotho',
       isoCode: 'LS',
       phoneCode: '+266',
       mask: '+### #### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Botswana',
       isoCode: 'BW',
       phoneCode: '+267',
       mask: '+### ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Swaziland',
       isoCode: 'SZ',
       phoneCode: '+268',
       mask: '+### # ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Comoros',
       isoCode: 'KM',
       phoneCode: '+269',
       mask: '+### ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Saint Helena, Ascension and Tristan Da Cunha',
       isoCode: 'SH',
       phoneCode: '+290',
       mask: '+### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Eritrea',
       isoCode: 'ER',
       phoneCode: '+291',
       mask: '+### ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Aruba',
       isoCode: 'AW',
       phoneCode: '+297',
       mask: '+### ## ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Faroe Islands',
       isoCode: 'FO',
       phoneCode: '+298',
       mask: '+### ######',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Greenland',
       isoCode: 'GL',
       phoneCode: '+299',
       mask: '+### ######',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Gibraltar',
       isoCode: 'GI',
       phoneCode: '+350',
       mask: '+### #####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Portugal',
       isoCode: 'PT',
       phoneCode: '+351',
       mask: '+### ### ### ###',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Luxembourg',
       isoCode: 'LU',
       phoneCode: '+352',
       mask: '+### ######',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Ireland',
       isoCode: 'IE',
       phoneCode: '+353',
       mask: '+### ## ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Iceland',
       isoCode: 'IS',
       phoneCode: '+354',
       mask: '+### ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Albania',
       isoCode: 'AL',
       phoneCode: '+355',
       mask: '+### ## ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Malta',
       isoCode: 'MT',
       phoneCode: '+356',
       mask: '+### #### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Cyprus',
       isoCode: 'CY',
       phoneCode: '+357',
       mask: '+### # ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Finland',
       isoCode: 'FI',
       phoneCode: '+358',
       mask: '+### ## ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Bulgaria',
       isoCode: 'BG',
       phoneCode: '+359',
       mask: '+### # ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Lithuania',
       isoCode: 'LT',
       phoneCode: '+370',
       mask: '+### ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Latvia',
       isoCode: 'LV',
       phoneCode: '+371',
       mask: '+### #### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Estonia',
       isoCode: 'EE',
       phoneCode: '+372',
       mask: '+### ### ###',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Moldova, Republic of',
       isoCode: 'MD',
       phoneCode: '+373',
       mask: '+### ### #####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Armenia',
       isoCode: 'AM',
       phoneCode: '+374',
       mask: '+### ### ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Belarus',
       isoCode: 'BY',
       phoneCode: '+375',
       mask: '+### (##) ###-##-##',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Andorra',
       isoCode: 'AD',
       phoneCode: '+376',
       mask: '+### ### ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Monaco',
       isoCode: 'MC',
       phoneCode: '+377',
       mask: '+### #### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'San Marino',
       isoCode: 'SM',
       phoneCode: '+378',
       mask: '+### #### ######',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Holy See (Vatican City State)',
       isoCode: 'VA',
       phoneCode: '+379',
       mask: '+### #### #######',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Ukraine',
       isoCode: 'UA',
       phoneCode: '+380',
       mask: '+### ## ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Serbia',
       isoCode: 'RS',
       phoneCode: '+381',
       mask: '+### ## ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Montenegro',
       isoCode: 'ME',
       phoneCode: '+382',
       mask: '+### ## ######',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Croatia',
       isoCode: 'HR',
       phoneCode: '+385',
       mask: '+### ## ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Slovenia',
       isoCode: 'SI',
       phoneCode: '+386',
       mask: '+### # ### ## ##',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Bosnia and Herzegovina',
       isoCode: 'BA',
       phoneCode: '+387',
       mask: '+### ### ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Macedonia',
       isoCode: 'MK',
       phoneCode: '+389',
       mask: '+### # ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Czech Republic',
       isoCode: 'CZ',
       phoneCode: '+420',
       mask: '+### ### ### ###',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Slovakia',
       isoCode: 'SK',
       phoneCode: '+421',
       mask: '+### ### ### ###',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Liechtenstein',
       isoCode: 'LI',
       phoneCode: '+423',
       mask: '+### ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Falkland Islands (Malvinas)',
       isoCode: 'FK',
       phoneCode: '+500',
       mask: '+### #####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Belize',
       isoCode: 'BZ',
       phoneCode: '+501',
       mask: '+### ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Guatemala',
       isoCode: 'GT',
       phoneCode: '+502',
       mask: '+### ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'El Salvador',
       isoCode: 'SV',
       phoneCode: '+503',
       mask: '+### ## #### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Honduras',
       isoCode: 'HN',
       phoneCode: '+504',
       mask: '+### ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Nicaragua',
       isoCode: 'NI',
       phoneCode: '+505',
       mask: '+### #### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Costa Rica',
       isoCode: 'CR',
       phoneCode: '+506',
       mask: '+### # ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Panama',
       isoCode: 'PA',
       phoneCode: '+507',
       mask: '+### ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Saint Pierre and Miquelon',
       isoCode: 'PM',
       phoneCode: '+508',
       mask: '+### ## ## ##',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Haiti',
       isoCode: 'HT',
       phoneCode: '+509',
       mask: '+### ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Guadeloupe',
       isoCode: 'GP',
       phoneCode: '+590',
       mask: '+### ### ## ## ##',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Saint Barthélemy',
       isoCode: 'BL',
       phoneCode: '+590',
       mask: '+### ### ## ## ##',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Saint Martin',
       isoCode: 'MF',
       phoneCode: '+590',
       mask: '+### ### ## ## ##',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Bolivia, Plurinational State of',
       isoCode: 'BO',
       phoneCode: '+591',
       mask: '+### ### ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Guyana',
       isoCode: 'GY',
       phoneCode: '+592',
       mask: '+### ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Ecuador',
       isoCode: 'EC',
       phoneCode: '+593',
       mask: '+### ## ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'French Guiana',
       isoCode: 'GF',
       phoneCode: '+594',
       mask: '+### ### ## ## ##',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Paraguay',
       isoCode: 'PY',
       phoneCode: '+595',
       mask: '+### ### ######',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Martinique',
       isoCode: 'MQ',
       phoneCode: '+596',
       mask: '+### ### ## ## ##',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Suriname',
       isoCode: 'SR',
       phoneCode: '+597',
       mask: '+### ######',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Uruguay',
       isoCode: 'UY',
       phoneCode: '+598',
       mask: '+### #### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Netherlands Antilles',
       isoCode: 'AN',
       phoneCode: '+599',
       mask: '+### ########',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Timor-Leste',
       isoCode: 'TL',
       phoneCode: '+670',
       mask: '+### ### ###',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Norfolk Island',
       isoCode: 'NF',
       phoneCode: '+672',
       mask: '+### # ## ###',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Brunei Darussalam',
       isoCode: 'BN',
       phoneCode: '+673',
       mask: '+### ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Nauru',
       isoCode: 'NR',
       phoneCode: '+674',
       mask: '+### ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Papua New Guinea',
       isoCode: 'PG',
       phoneCode: '+675',
       mask: '+### ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Tonga',
       isoCode: 'TO',
       phoneCode: '+676',
       mask: '+### ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Solomon Islands',
       isoCode: 'SB',
       phoneCode: '+677',
       mask: '+### #####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Vanuatu',
       isoCode: 'VU',
       phoneCode: '+678',
       mask: '+### #####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Fiji',
       isoCode: 'FJ',
       phoneCode: '+679',
       mask: '+### ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Palau',
       isoCode: 'PW',
       phoneCode: '+680',
       mask: '+### ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Wallis and Futuna',
       isoCode: 'WF',
       phoneCode: '+681',
       mask: '+### ## ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Cook Islands',
       isoCode: 'CK',
       phoneCode: '+682',
       mask: '+### ## ###',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Niue',
       isoCode: 'NU',
       phoneCode: '+683',
       mask: '+### #######',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Samoa',
       isoCode: 'WS',
       phoneCode: '+685',
       mask: '+### ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Kiribati',
       isoCode: 'KI',
       phoneCode: '+686',
       mask: '+### #####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'New Caledonia',
       isoCode: 'NC',
       phoneCode: '+687',
       mask: '+### ######',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Tuvalu',
       isoCode: 'TV',
       phoneCode: '+688',
       mask: '+### #####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'French Polynesia',
       isoCode: 'PF',
       phoneCode: '+689',
       mask: '+### ## ## ## ##',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Tokelau',
       isoCode: 'TK',
       phoneCode: '+690',
       mask: '+### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Micronesia, Federated States of',
       isoCode: 'FM',
       phoneCode: '+691',
       mask: '+### ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Marshall Islands',
       isoCode: 'MH',
       phoneCode: '+692',
       mask: '+### ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: "Korea, Democratic People's Republic of",
       isoCode: 'KP',
       phoneCode: '+850',
       mask: '+### # ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Hong Kong',
       isoCode: 'HK',
       phoneCode: '+852',
       mask: '+### #### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Macao',
       isoCode: 'MO',
       phoneCode: '+853',
       mask: '+### #### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Cambodia',
       isoCode: 'KH',
       phoneCode: '+855',
       mask: '+### ## ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: "(Laos) Lao People's Democratic Republic",
       isoCode: 'LA',
       phoneCode: '+856',
       mask: '+### ## #### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Bangladesh',
       isoCode: 'BD',
       phoneCode: '+880',
       mask: '+### ### ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Taiwan',
       isoCode: 'TW',
       phoneCode: '+886',
       mask: '+### # #### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Maldives',
       isoCode: 'MV',
       phoneCode: '+960',
       mask: '+### ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Lebanon',
       isoCode: 'LB',
       phoneCode: '+961',
       mask: '+### ## ### ###',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Jordan',
       isoCode: 'JO',
       phoneCode: '+962',
       mask: '+### # ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Syrian Arab Republic',
       isoCode: 'SY',
       phoneCode: '+963',
       mask: '+### ## ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Iraq',
       isoCode: 'IQ',
       phoneCode: '+964',
       mask: '+### (##) ### #####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Kuwait',
       isoCode: 'KW',
       phoneCode: '+965',
       mask: '+### #### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Saudi Arabia',
       isoCode: 'SA',
       phoneCode: '+966',
       mask: '+### ## ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Yemen',
       isoCode: 'YE',
       phoneCode: '+967',
       mask: '+### # ######',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Oman',
       isoCode: 'OM',
       phoneCode: '+968',
       mask: '+### #### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Palestina',
       isoCode: 'PS',
       phoneCode: '+970',
       mask: '+### # ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'United Arab Emirates',
       isoCode: 'AE',
       phoneCode: '+971',
       mask: '+### ## ######',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Israel',
       isoCode: 'IL',
       phoneCode: '+972',
       mask: '+### ## ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Bahrain',
       isoCode: 'BH',
       phoneCode: '+973',
       mask: '+### ### ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Qatar',
       isoCode: 'QA',
       phoneCode: '+974',
       mask: '+### #### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Bhutan',
       isoCode: 'BT',
       phoneCode: '+975',
       mask: '+### ## ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Mongolia',
       isoCode: 'MN',
       phoneCode: '+976',
       mask: '+### ## ######',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Nepal',
       isoCode: 'NP',
       phoneCode: '+977',
       mask: '+### ### ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Tajikistan',
       isoCode: 'TJ',
       phoneCode: '+992',
       mask: '+### ## ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Turkmenistan',
       isoCode: 'TM',
       phoneCode: '+993',
       mask: '+### ## ######',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Azerbaijan',
       isoCode: 'AZ',
       phoneCode: '+994',
       mask: '+### ### ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Georgia',
       isoCode: 'GE',
       phoneCode: '+995',
       mask: '+### ### ######',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Kyrgyzstan',
       isoCode: 'KG',
       phoneCode: '+996',
       mask: '+### ### ######',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Uzbekistan',
       isoCode: 'UZ',
       phoneCode: '+998',
       mask: '+### ## ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Dominica',
       isoCode: 'DM',
       phoneCode: '+1767',
       mask: '+#### ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Dominican Republic',
       isoCode: 'DO',
       phoneCode: '+1809',
       mask: '+#### ### ####',
       alternativePhoneCodes: [],
     ),
-    PhoneCountry(
+    ACPhoneCountry(
       name: 'Puerto Rico',
       isoCode: 'PR',
       phoneCode: '+1939',

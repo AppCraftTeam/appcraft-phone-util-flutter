@@ -1,13 +1,12 @@
 {
   "roots": [
-    "phone_util"
+    "appcraft_phone_util_flutter"
   ],
   "packages": [
     {
-      "name": "phone_util",
+      "name": "appcraft_phone_util_flutter",
       "version": "0.0.1",
       "dependencies": [
-        "equatable",
         "flutter"
       ],
       "devDependencies": [
@@ -30,14 +29,6 @@
         "stream_channel",
         "test_api",
         "vector_math"
-      ]
-    },
-    {
-      "name": "equatable",
-      "version": "2.0.8",
-      "dependencies": [
-        "collection",
-        "meta"
       ]
     },
     {

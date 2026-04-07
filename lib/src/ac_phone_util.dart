@@ -3,29 +3,33 @@
 import 'dart:math' as math;
 import 'dart:ui';
 
-import 'data/phone_countries.dart';
-import 'data/phone_country_localizations.dart';
-import 'domain/phone_country.dart';
-import 'domain/phone_data.dart';
+import 'data/ac_phone_countries.dart';
+import 'data/ac_phone_country_localizations.dart';
+import 'domain/ac_phone_country.dart';
+import 'domain/ac_phone_data.dart';
 
-class PhoneUtil {
-  const PhoneUtil._();
+/// Main utility class for phone number parsing, validation and formatting.
+class ACPhoneUtil {
+  const ACPhoneUtil._();
 
-  static const instance = PhoneUtil._();
+  /// Singleton instance of [ACPhoneUtil].
+  static const instance = ACPhoneUtil._();
   static const int _maxLengthPhoneCode = 4;
 
-  List<PhoneCountry> getCountries({
+  /// Returns a list of [ACPhoneCountry] optionally localized by [locale]
+  /// and filtered by [search] string.
+  List<ACPhoneCountry> getCountries({
     Locale? locale,
-    String? search
+    String? search,
   }) {
-    var countries = PhoneCountries.instance.all;
+    var countries = ACPhoneCountries.instance.all;
 
     if (locale != null) {
-      final localizations = PhoneCountryLocalizations(locale);
+      final localizations = ACPhoneCountryLocalizations(locale);
       countries = countries
         .map((country) => country.copyWith(
           name: localizations.countryName(
-            isoCode: country.isoCode
+            isoCode: country.isoCode,
           ),
         ))
         .toList();
@@ -41,7 +45,9 @@ class PhoneUtil {
     return countries;
   }
 
-  PhoneData? findPhone({
+  /// Parses a [phoneNumber] string and returns [ACPhoneData] with
+  /// the matched country and formatted number, or `null` if no match found.
+  ACPhoneData? findPhone({
     required String phoneNumber,
   }) {
     final phoneNumberSanitized = _sanitize(phoneNumber);
@@ -72,12 +78,14 @@ class PhoneUtil {
     );
 
     // 5) Result
-    return PhoneData(
+    return ACPhoneData(
       phoneNumberMasked: result,
       country: phoneNumberCountry,
     );
   }
 
+  /// Returns `true` if [phoneNumber] is a valid phone number
+  /// matching a known country mask.
   bool phoneIsValid({
     required String phoneNumber,
   }) {
@@ -99,7 +107,6 @@ class PhoneUtil {
     } catch (_) {
       return false;
     }
-    
   }
 
   /// Sanitize string for numbers
@@ -118,12 +125,12 @@ class PhoneUtil {
         ),
       );
 
-  PhoneCountry? _parseCountry({
+  ACPhoneCountry? _parseCountry({
     required String potentialPhoneCode,
   }) {
     for (var i = potentialPhoneCode.length; i >= 0; i--) {
       final potentialPhoneCodeSubstring = potentialPhoneCode.substring(0, i);
-      final country = PhoneCountries.instance.hashedCountries[potentialPhoneCodeSubstring];
+      final country = ACPhoneCountries.instance.hashedCountries[potentialPhoneCodeSubstring];
 
       if (country != null) return country;
       continue;
@@ -166,7 +173,7 @@ class PhoneUtil {
         phoneNumberIndex++;
         continue;
       }
-      
+
       if (int.tryParse(currentMaskChar) != null) {
         result = '$result$currentMaskChar';
         phoneNumberIndex++;
@@ -179,5 +186,4 @@ class PhoneUtil {
 
     return result;
   }
-
 }
