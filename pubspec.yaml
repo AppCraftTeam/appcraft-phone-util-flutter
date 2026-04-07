@@ -1,4 +1,4 @@
-name: phone_util
+name: appcraft_phone_util_flutter
 description: A flutter package to select a country from a list of countries.
 
 version: 0.0.1
@@ -10,8 +10,6 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  # TODO: Отказаться от этой зависимости
-  equatable: ^2.0.7
 
 dev_dependencies:
   flutter_test:

@@ -36,13 +36,18 @@ import '../assets/localizations/tr.dart';
 import '../assets/localizations/tw.dart';
 import '../assets/localizations/uk.dart';
 
-class PhoneCountryLocalizations {
-  const PhoneCountryLocalizations(this.locale);
+/// Provides localized country names based on a given [Locale].
+class ACPhoneCountryLocalizations {
+  /// Creates an [ACPhoneCountryLocalizations] for the given [locale].
+  const ACPhoneCountryLocalizations(this.locale);
 
+  /// The locale used for country name lookups.
   final Locale locale;
 
+  /// Returns the localized country name for the given [isoCode],
+  /// or `null` if no translation is available.
   String? countryName({
-    required String isoCode
+    required String isoCode,
   }) {
     switch (locale.languageCode) {
       case 'zh':
