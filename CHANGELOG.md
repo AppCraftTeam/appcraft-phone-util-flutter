@@ -5,6 +5,33 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.0] - 2026-04-14
+
+### BREAKING CHANGES
+
+- `ACPhoneInputFormatter`: параметры `country` и `onPhoneChanged` удалены. Форматтер теперь принимает один обязательный параметр `mask: String`. Авто-определение страны больше не встроено в форматтер — используйте `ACPhoneEditingController` (auto-detect) или `ACNationalPhoneEditingController` (с явной страной).
+- `ACPhoneCountry.telMask` переименован в `nationalMask`. Поведение изменено: скобки и дефисы теперь сохраняются. Для старого поведения (без скобок и дефисов) используйте новый `rawNationalMask`.
+
+### Added
+
+- `ACPhoneCountry.rawMask` — полная маска без `(`, `)`, `-`; разделитель — только пробел.
+- `ACPhoneCountry.rawNationalMask` — национальная маска без `(`, `)`, `-`.
+- `ACNationalPhoneEditingController` — контроллер ввода национальной части номера с внешне задаваемой страной (`country` через конструктор и сеттер). `rawPhoneNumber` возвращает полный номер, `isValid` валидирует через `ACPhoneUtil`.
+- Пример приложения обновлён: две отдельные демо-страницы (`auto_detect_demo_page.dart`, `national_phone_demo_page.dart`) с навигацией из главного экрана.
+
+### Migration
+
+```dart
+// BEFORE (0.0.1)
+ACPhoneInputFormatter(country: country, onPhoneChanged: (d) => ...);
+
+// AFTER (1.0.0) — полный номер
+ACPhoneInputFormatter(mask: country.mask);
+
+// AFTER — только национальная часть
+ACPhoneInputFormatter(mask: country.nationalMask);
+```
+
 ## [0.0.1] - 2026-04-07
 
 ### Added
