@@ -111,7 +111,7 @@ void main() {
 
         // Assert
         expect(notified, isTrue);
-        expect(controller.country.isoCode, 'US');
+        expect(controller.country?.isoCode, 'US');
         expect(controller.rawPhoneNumber.startsWith('+1'), isTrue);
         final digits = controller.text.replaceAll(RegExp(r'\D'), '');
         expect(digits.length, lessThanOrEqualTo(10));
@@ -201,6 +201,90 @@ void main() {
 
         // Act & Assert
         expect(controller.dispose, returnsNormally);
+      });
+    });
+
+    group('nullable country', () {
+      test('init with null country returns empty and invalid state', () {
+        // Arrange & Act
+        final controller = ACNationalPhoneEditingController(country: null);
+
+        // Assert
+        expect(controller.text, '');
+        expect(controller.rawPhoneNumber, '');
+        expect(controller.isValid, isFalse);
+        expect(controller.phoneData, isNull);
+        expect(controller.country, isNull);
+
+        // Cleanup
+        controller.dispose();
+      });
+
+      test('init with null country ignores initialPhoneNumber formatting', () {
+        // Arrange & Act
+        final controller = ACNationalPhoneEditingController(
+          country: null,
+          initialPhoneNumber: '9009998877',
+        );
+
+        // Assert
+        expect(controller.text, '');
+        expect(controller.rawPhoneNumber, '');
+
+        // Cleanup
+        controller.dispose();
+      });
+
+      test('setCountry from null to non-null formats stored digits', () {
+        // Arrange
+        final controller = ACNationalPhoneEditingController(country: null);
+
+        // Act
+        controller.setPhoneNumber('9009998877');
+        // Before country set: digits stored without formatting.
+        final textBeforeCountry = controller.text;
+        controller.country = ru;
+
+        // Assert
+        expect(textBeforeCountry, '9009998877');
+        expect(controller.text, '(900) 999-88-77');
+        expect(controller.rawPhoneNumber, '+79009998877');
+
+        // Cleanup
+        controller.dispose();
+      });
+
+      test('setCountry from non-null to null clears text and raw', () {
+        // Arrange
+        final controller = ACNationalPhoneEditingController(country: ru)
+          ..setPhoneNumber('9009998877');
+
+        // Act
+        controller.country = null;
+
+        // Assert
+        expect(controller.text, '');
+        expect(controller.rawPhoneNumber, '');
+        expect(controller.isValid, isFalse);
+
+        // Cleanup
+        controller.dispose();
+      });
+
+      test('setPhoneNumber with null country stores only digits without raw',
+          () {
+        // Arrange
+        final controller = ACNationalPhoneEditingController(country: null);
+
+        // Act
+        controller.setPhoneNumber('abc123');
+
+        // Assert
+        expect(controller.text, '123');
+        expect(controller.rawPhoneNumber, '');
+
+        // Cleanup
+        controller.dispose();
       });
     });
   });

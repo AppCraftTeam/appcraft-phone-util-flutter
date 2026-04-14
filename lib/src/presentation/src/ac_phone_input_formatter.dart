@@ -32,15 +32,14 @@ class ACPhoneInputFormatter extends TextInputFormatter {
     TextEditingValue oldValue,
     TextEditingValue newValue,
   ) {
+    if (mask.isEmpty) {
+      return newValue;
+    }
+
     final digits = newValue.text.replaceAll(_nonDigitRegExp, '');
 
     if (digits.isEmpty) {
       return TextEditingValue.empty;
-    }
-    if (mask.isEmpty) {
-      return const TextEditingValue(
-        selection: TextSelection.collapsed(offset: 0),
-      );
     }
 
     final digitsBeforeCursor = _countDigitsBeforeOffset(

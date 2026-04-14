@@ -123,16 +123,21 @@ void main() {
     });
 
     group('given empty mask when any input', () {
-      test('returns empty text with zero cursor offset', () {
+      test('returns newValue unchanged (safe passthrough)', () {
         // Arrange
         final formatter = ACPhoneInputFormatter(mask: '');
+        const newValue = TextEditingValue(
+          text: '123abc',
+          selection: TextSelection.collapsed(offset: 6),
+        );
+        const oldValue = TextEditingValue.empty;
 
         // Act
-        final result = _formatFromEmpty(formatter, '123');
+        final result = formatter.formatEditUpdate(oldValue, newValue);
 
         // Assert
-        expect(result.text, '');
-        expect(result.selection, const TextSelection.collapsed(offset: 0));
+        expect(result.text, '123abc');
+        expect(result.selection.baseOffset, 6);
       });
     });
   });
