@@ -14,6 +14,10 @@ import '../../domain/ac_phone_masked.dart';
 /// [rawPhoneNumber], [phoneData] and [isValid] behave as if no phone number
 /// has been entered.
 ///
+/// [setPhoneNumber] accepts a full phone number (e.g. `+79009998877`) and
+/// auto-detects [country] via [ACPhoneUtil.findPhone]; unrecognized input
+/// clears [country] and stores only digits.
+///
 /// Reformatting is performed only via the public entry points —
 /// [setPhoneNumber] and the [country] setter. Direct assignments to [text]
 /// are considered out-of-contract and do not trigger re-masking.
@@ -21,18 +25,21 @@ class ACNationalPhoneEditingController extends TextEditingController {
   /// Creates a controller for entering the national part of a phone number.
   ///
   /// [country] is optional; when `null`, the controller has no active mask
-  /// and stores only raw digits until a country is assigned.
-  /// [initialPhoneNumber] is the national part as a raw or partially-formatted
-  /// string; a leading country code prefix (matching [ACPhoneCountry.phoneCode])
-  /// is stripped automatically. When [country] is `null` the
-  /// [initialPhoneNumber] is ignored and [text] remains empty until a country
-  /// is assigned.
+  /// and stores only raw digits until a country is assigned or a recognizable
+  /// phone number is provided via [setPhoneNumber].
+  ///
+  /// When [initialPhoneNumber] is provided, it is interpreted as a full phone
+  /// number (for example, `+79009998877`) and is passed to [setPhoneNumber].
+  /// If the number is recognized via [ACPhoneUtil.findPhone], the controller's
+  /// [country] is set from the detected country, overriding the [country]
+  /// argument passed to the constructor. If the number is not recognized,
+  /// [country] becomes `null` and only digits are stored in [text].
   ACNationalPhoneEditingController({
     ACPhoneCountry? country,
     String? initialPhoneNumber,
   })  : _country = country,
         super(text: '') {
-    if (initialPhoneNumber != null && country != null) {
+    if (initialPhoneNumber != null) {
       setPhoneNumber(initialPhoneNumber);
     }
   }
@@ -115,57 +122,47 @@ class ACNationalPhoneEditingController extends TextEditingController {
     return ACPhoneUtil.instance.phoneIsValid(phoneNumber: raw);
   }
 
-  /// Programmatically sets the national part of the phone number.
+  /// Programmatically sets the phone number from a full (international) [input].
   ///
-  /// When [country] is `null`, only digits are extracted from [input] and
-  /// stored in [text] without any mask or truncation.
+  /// The [input] is expected to be a full phone number, for example
+  /// `+79009998877`. The controller delegates recognition to
+  /// [ACPhoneUtil.findPhone]:
   ///
-  /// Otherwise, if [input] starts with a country-code prefix matching the
-  /// current [country] (e.g. `+7` for RU), the prefix is stripped before
-  /// digits are extracted. Any leading `+` is ignored as a non-digit
-  /// character. Digits are truncated to the mask length.
+  /// - If the number is recognized, [country] is updated to the detected
+  ///   country and [text] is set to the national part formatted under
+  ///   [ACPhoneCountry.nationalMask].
+  /// - If the number is not recognized, [country] becomes `null` and only
+  ///   the digits extracted from [input] are stored in [text], without any
+  ///   mask or truncation.
+  /// - If [input] is empty, [country] becomes `null` and [text] is cleared.
   void setPhoneNumber(String input) {
-    final country = _country;
-    if (country == null) {
-      final digits = input.replaceAll(RegExp(r'\D'), '');
-      text = digits;
+    if (input.isEmpty) {
+      _country = null;
+      text = '';
       return;
     }
 
-    var working = input;
-    final countryDigits = country.phoneCode.replaceAll(RegExp(r'\D'), '');
+    final phoneData = input.startsWith('+')
+        ? ACPhoneUtil.instance.findPhone(phoneNumber: input)
+        : null;
 
-    if (working.startsWith('+') && countryDigits.isNotEmpty) {
-      final afterPlus = working.substring(1);
-      final afterPlusDigits = afterPlus.replaceAll(RegExp(r'\D'), '');
-      if (afterPlusDigits.startsWith(countryDigits)) {
-        // Strip the '+' and the country-code digits from the original input,
-        // preserving any formatting characters that follow.
-        final stripped = afterPlus;
-        var remaining = countryDigits.length;
-        final buffer = StringBuffer();
-        for (var i = 0; i < stripped.length; i++) {
-          final ch = stripped[i];
-          if (remaining > 0 && RegExp(r'\d').hasMatch(ch)) {
-            remaining--;
-            continue;
-          }
-          buffer.write(ch);
-        }
-        working = buffer.toString();
-      }
+    if (phoneData != null) {
+      _country = phoneData.country;
+      final fullDigits = phoneData.rawPhoneNumber.replaceAll(RegExp(r'\D'), '');
+      final codeDigits =
+          phoneData.country.phoneCode.replaceAll(RegExp(r'\D'), '');
+      final nationalDigits = fullDigits.startsWith(codeDigits)
+          ? fullDigits.substring(codeDigits.length)
+          : fullDigits;
+      text = ACPhoneMasked.setMask(
+        phoneData.country.nationalMask,
+        rawPhone: nationalDigits,
+      ).maskedPhone;
+      return;
     }
 
-    final allDigits = working.replaceAll(RegExp(r'\D'), '');
-    final maxDigits = _countHashes(country.nationalMask);
-    final digits = allDigits.length > maxDigits
-        ? allDigits.substring(0, maxDigits)
-        : allDigits;
-
-    text = ACPhoneMasked.setMask(
-      country.nationalMask,
-      rawPhone: digits,
-    ).maskedPhone;
+    _country = null;
+    text = input.replaceAll(RegExp(r'\D'), '');
   }
 
   int _countHashes(String mask) => '#'.allMatches(mask).length;
