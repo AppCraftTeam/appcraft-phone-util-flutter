@@ -1,5 +1,8 @@
 import 'package:appcraft_phone_util_flutter/ac_phone_util.dart';
+import 'package:appcraft_phone_util_flutter/src/data/ac_phone_countries.dart';
 import 'package:flutter_test/flutter_test.dart';
+
+int _countHashes(String s) => s.split('').where((c) => c == '#').length;
 
 void main() {
   group('ACPhoneCountry', () {
@@ -224,23 +227,6 @@ void main() {
       expect(codes, contains('1670'));
     });
 
-    test('telMask removes phone code prefix and parentheses', () {
-      // Arrange
-      const country = ACPhoneCountry(
-        name: 'Russia',
-        isoCode: 'RU',
-        phoneCode: '+7',
-        mask: '+# (###) ###-##-##',
-        alternativePhoneCodes: [],
-      );
-
-      // Act
-      final result = country.telMask;
-
-      // Assert
-      expect(result, '### ###-##-##');
-    });
-
     test('copyWith returns new object with replaced fields', () {
       // Arrange
       const original = ACPhoneCountry(
@@ -279,6 +265,179 @@ void main() {
 
       // Assert
       expect(copy, equals(original));
+    });
+  });
+
+  group('nationalMask', () {
+    test('returns mask without country-code prefix, separators preserved', () {
+      // Arrange
+      const country = ACPhoneCountry(
+        name: 'Russia',
+        isoCode: 'RU',
+        phoneCode: '+7',
+        mask: '+# (###) ###-##-##',
+        alternativePhoneCodes: [],
+      );
+
+      // Act
+      final result = country.nationalMask;
+
+      // Assert
+      expect(result, '(###) ###-##-##');
+    });
+
+    test('does not start with plus sign', () {
+      // Arrange
+      const country = ACPhoneCountry(
+        name: 'Russia',
+        isoCode: 'RU',
+        phoneCode: '+7',
+        mask: '+# (###) ###-##-##',
+        alternativePhoneCodes: [],
+      );
+
+      // Act
+      final result = country.nationalMask;
+
+      // Assert
+      expect(result.startsWith('+'), isFalse);
+    });
+
+    test('for all countries in ACPhoneCountries.all does not contain plus', () {
+      // Arrange
+      final countries = ACPhoneCountries.instance.all;
+
+      // Act & Assert
+      for (final country in countries) {
+        expect(
+          country.nationalMask.contains('+'),
+          isFalse,
+          reason: 'nationalMask contains "+" for ${country.isoCode}',
+        );
+      }
+    });
+  });
+
+  group('rawMask', () {
+    test('removes parentheses and hyphens, only spaces as separators', () {
+      // Arrange
+      const country = ACPhoneCountry(
+        name: 'Russia',
+        isoCode: 'RU',
+        phoneCode: '+7',
+        mask: '+# (###) ###-##-##',
+        alternativePhoneCodes: [],
+      );
+
+      // Act
+      final result = country.rawMask;
+
+      // Assert
+      expect(result, '+# ### ### ## ##');
+    });
+
+    test('for all countries preserves # count and has no (, ), -', () {
+      // Arrange
+      final countries = ACPhoneCountries.instance.all;
+
+      // Act & Assert
+      for (final country in countries) {
+        expect(
+          _countHashes(country.mask),
+          _countHashes(country.rawMask),
+          reason: 'hash count mismatch for ${country.isoCode}',
+        );
+        expect(
+          country.rawMask.contains('('),
+          isFalse,
+          reason: 'rawMask contains "(" for ${country.isoCode}',
+        );
+        expect(
+          country.rawMask.contains(')'),
+          isFalse,
+          reason: 'rawMask contains ")" for ${country.isoCode}',
+        );
+        expect(
+          country.rawMask.contains('-'),
+          isFalse,
+          reason: 'rawMask contains "-" for ${country.isoCode}',
+        );
+      }
+    });
+  });
+
+  group('rawNationalMask', () {
+    test('removes parentheses, hyphens and country-code prefix', () {
+      // Arrange
+      const country = ACPhoneCountry(
+        name: 'Russia',
+        isoCode: 'RU',
+        phoneCode: '+7',
+        mask: '+# (###) ###-##-##',
+        alternativePhoneCodes: [],
+      );
+
+      // Act
+      final result = country.rawNationalMask;
+
+      // Assert
+      expect(result, '### ### ## ##');
+    });
+
+    test('invariants hold for all countries in ACPhoneCountries.all', () {
+      // Arrange
+      final countries = ACPhoneCountries.instance.all;
+
+      // Act & Assert
+      for (final country in countries) {
+        final maskHashes = _countHashes(country.mask);
+        final nationalHashes = _countHashes(country.nationalMask);
+        final rawNationalHashes = _countHashes(country.rawNationalMask);
+        final phoneCodeDigits =
+            country.phoneCode.replaceAll(RegExp('[^0-9]'), '').length;
+
+        expect(
+          nationalHashes,
+          rawNationalHashes,
+          reason:
+              'nationalMask/rawNationalMask hash count mismatch for ${country.isoCode}',
+        );
+        if (country.mask.startsWith('+')) {
+          expect(
+            maskHashes - nationalHashes,
+            phoneCodeDigits,
+            reason:
+                'mask - nationalMask hashes != phoneCode digits for ${country.isoCode}',
+          );
+        } else {
+          expect(
+            maskHashes - nationalHashes,
+            0,
+            reason:
+                'mask without "+" prefix: nationalMask must equal mask for ${country.isoCode}',
+          );
+        }
+        expect(
+          country.rawNationalMask.contains('('),
+          isFalse,
+          reason: 'rawNationalMask contains "(" for ${country.isoCode}',
+        );
+        expect(
+          country.rawNationalMask.contains(')'),
+          isFalse,
+          reason: 'rawNationalMask contains ")" for ${country.isoCode}',
+        );
+        expect(
+          country.rawNationalMask.contains('-'),
+          isFalse,
+          reason: 'rawNationalMask contains "-" for ${country.isoCode}',
+        );
+        expect(
+          country.rawNationalMask.startsWith('+'),
+          isFalse,
+          reason: 'rawNationalMask starts with "+" for ${country.isoCode}',
+        );
+      }
     });
   });
 }

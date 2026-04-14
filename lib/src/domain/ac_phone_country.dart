@@ -48,12 +48,32 @@ class ACPhoneCountry {
     return result;
   }
 
-  /// Example: ### ###-##-##
-  String get telMask =>
+  /// National mask without the leading country-code prefix.
+  /// Brackets and dashes are preserved.
+  ///
+  /// Example: `(###) ###-##-##` for mask `+# (###) ###-##-##`.
+  String get nationalMask =>
+    mask.replaceAll(RegExp(r'^\+[#]*\s'), '');
+
+  /// Full mask with `(`, `)` and `-` removed; only spaces are used
+  /// as separators between digit groups.
+  ///
+  /// Example: `+# ### ### ## ##` for mask `+# (###) ###-##-##`.
+  String get rawMask =>
     mask
-      .replaceAll(RegExp(r'^\+[#]*\s'), '')
       .replaceAll('(', '')
-      .replaceAll(')', '');
+      .replaceAll(')', '')
+      .replaceAll('-', ' ');
+
+  /// National mask with `(`, `)` and `-` removed; only spaces are used
+  /// as separators between digit groups.
+  ///
+  /// Example: `### ### ## ##` for mask `+# (###) ###-##-##`.
+  String get rawNationalMask =>
+    nationalMask
+      .replaceAll('(', '')
+      .replaceAll(')', '')
+      .replaceAll('-', ' ');
 
   /// Creates a copy of this [ACPhoneCountry] with the given fields replaced.
   ACPhoneCountry copyWith({
