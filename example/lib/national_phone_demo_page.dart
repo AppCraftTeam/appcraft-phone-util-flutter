@@ -1,7 +1,6 @@
 import 'package:appcraft_phone_util_flutter/ac_phone_util.dart';
 import 'package:appcraft_phone_util_flutter/src/data/ac_phone_countries.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 /// Demo page showcasing [ACNationalPhoneEditingController] with an
 /// externally selected country. The user picks a country from a dropdown,
@@ -81,7 +80,6 @@ class _NationalPhoneDemoPageState extends State<NationalPhoneDemoPage> {
             controller: _controller,
             keyboardType: TextInputType.phone,
             inputFormatters: [
-              FilteringTextInputFormatter.digitsOnly,
               ACPhoneInputFormatter(mask: _country.nationalMask),
             ],
             decoration: InputDecoration(

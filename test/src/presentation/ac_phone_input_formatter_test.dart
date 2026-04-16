@@ -357,5 +357,171 @@ void main() {
         },
       );
     });
+
+    group('digits-only filtering — paste (US2)', () {
+      test('paste только буквы → text пустой', () {
+        final formatter = ACPhoneInputFormatter(mask: '+# (###) ###-##-##');
+        const oldValue = TextEditingValue.empty;
+        const newValue = TextEditingValue(
+          text: 'abc',
+          selection: TextSelection.collapsed(offset: 3),
+        );
+        final result = formatter.formatEditUpdate(oldValue, newValue);
+        expect(result.text, '');
+      });
+
+      test('paste буквы вперемешку с цифрами → только digits применены к маске', () {
+        final formatter = ACPhoneInputFormatter(mask: '+# (###) ###-##-##');
+        const oldValue = TextEditingValue.empty;
+        const newValue = TextEditingValue(
+          text: 'phone: 123',
+          selection: TextSelection.collapsed(offset: 10),
+        );
+        final result = formatter.formatEditUpdate(oldValue, newValue);
+        expect(result.text, '+1 (23');
+      });
+
+      test('paste полностью отформатированного номера → сохраняется', () {
+        final formatter = ACPhoneInputFormatter(mask: '+# (###) ###-##-##');
+        const oldValue = TextEditingValue.empty;
+        const newValue = TextEditingValue(
+          text: '+7 (900) 999-88-77',
+          selection: TextSelection.collapsed(offset: 18),
+        );
+        final result = formatter.formatEditUpdate(oldValue, newValue);
+        expect(result.text, '+7 (900) 999-88-77');
+      });
+
+      test('paste с emoji → emoji отброшены', () {
+        final formatter = ACPhoneInputFormatter(mask: '+# (###) ###-##-##');
+        const oldValue = TextEditingValue.empty;
+        const newValue = TextEditingValue(
+          text: '📞 79009998877',
+          selection: TextSelection.collapsed(offset: 16),
+        );
+        final result = formatter.formatEditUpdate(oldValue, newValue);
+        expect(result.text, '+7 (900) 999-88-77');
+      });
+
+      test('paste с unicode whitespace (nbsp, thin space) → whitespace отброшен', () {
+        final formatter = ACPhoneInputFormatter(mask: '+# (###) ###-##-##');
+        const oldValue = TextEditingValue.empty;
+        // \u00a0 = non-breaking space, \u2003 = em space
+        const newValue = TextEditingValue(
+          text: '\u00a07\u20039',
+          selection: TextSelection.collapsed(offset: 4),
+        );
+        final result = formatter.formatEditUpdate(oldValue, newValue);
+        expect(result.text, '+7 (9');
+      });
+
+      test('paste только не-цифр (hello world) → text пустой', () {
+        final formatter = ACPhoneInputFormatter(mask: '+# (###) ###-##-##');
+        const oldValue = TextEditingValue.empty;
+        const newValue = TextEditingValue(
+          text: 'hello world',
+          selection: TextSelection.collapsed(offset: 11),
+        );
+        final result = formatter.formatEditUpdate(oldValue, newValue);
+        expect(result.text, '');
+      });
+
+      test('paste длинной строки с 20+ цифрами → text обрезан до mask.length', () {
+        final formatter = ACPhoneInputFormatter(mask: '+# (###) ###-##-##');
+        const oldValue = TextEditingValue.empty;
+        const longInput = '12345678901234567890';
+        const newValue = TextEditingValue(
+          text: longInput,
+          selection: TextSelection.collapsed(offset: 20),
+        );
+        final result = formatter.formatEditUpdate(oldValue, newValue);
+        expect(result.text.length, lessThanOrEqualTo('+# (###) ###-##-##'.length));
+      });
+    });
+
+    group('digits-only filtering — hardware typing (US3)', () {
+      test('ввод буквы a в пустое поле → text пустой', () {
+        final formatter = ACPhoneInputFormatter(mask: '+# (###) ###-##-##');
+        const oldValue = TextEditingValue.empty;
+        const newValue = TextEditingValue(
+          text: 'a',
+          selection: TextSelection.collapsed(offset: 1),
+        );
+        final result = formatter.formatEditUpdate(oldValue, newValue);
+        expect(result.text, '');
+      });
+
+      test('ввод буквы x в конец +7 (900) 9 → буква отброшена, digits неизменны', () {
+        final formatter = ACPhoneInputFormatter(mask: '+# (###) ###-##-##');
+        const oldText = '+7 (900) 9';
+        const oldValue = TextEditingValue(
+          text: oldText,
+          selection: TextSelection.collapsed(offset: 10),
+        );
+        const newValue = TextEditingValue(
+          text: '+7 (900) 9x',
+          selection: TextSelection.collapsed(offset: 11),
+        );
+        final result = formatter.formatEditUpdate(oldValue, newValue);
+        // buква `x` отброшена — digit count остался 5 (7, 9, 0, 0, 9),
+        // text идентичен oldText.
+        expect(result.text, oldText);
+      });
+
+      test('ввод спец-символа \$ → text пустой', () {
+        final formatter = ACPhoneInputFormatter(mask: '+# (###) ###-##-##');
+        const oldValue = TextEditingValue.empty;
+        const newValue = TextEditingValue(
+          text: r'$',
+          selection: TextSelection.collapsed(offset: 1),
+        );
+        final result = formatter.formatEditUpdate(oldValue, newValue);
+        expect(result.text, '');
+      });
+    });
+
+    group('backward compat — digitsOnly + ACPhoneInputFormatter chain (FR-006)', () {
+      test('chain с digitsOnly даёт тот же результат что только ACPhoneInputFormatter', () {
+        final formatter = ACPhoneInputFormatter(mask: '+# (###) ###-##-##');
+        final digitsOnly = FilteringTextInputFormatter.digitsOnly;
+
+        // Входы с не-цифровым мусором
+        final inputs = <TextEditingValue>[
+          const TextEditingValue(
+            text: 'Phone: 79009998877',
+            selection: TextSelection.collapsed(offset: 18),
+          ),
+          const TextEditingValue(
+            text: '+7 (900) 999-88-77',
+            selection: TextSelection.collapsed(offset: 18),
+          ),
+          const TextEditingValue(
+            text: 'abc123',
+            selection: TextSelection.collapsed(offset: 6),
+          ),
+        ];
+
+        for (final newValue in inputs) {
+          // С одним только ACPhoneInputFormatter:
+          final single = formatter.formatEditUpdate(TextEditingValue.empty, newValue);
+
+          // С chain [digitsOnly, ACPhoneInputFormatter]:
+          final afterDigitsOnly = digitsOnly.formatEditUpdate(
+            TextEditingValue.empty,
+            newValue,
+          );
+          final chained = formatter.formatEditUpdate(
+            TextEditingValue.empty,
+            afterDigitsOnly,
+          );
+
+          expect(
+            chained.text,
+            single.text,
+            reason: 'chain и single должны давать одинаковый text для "${newValue.text}"',
+          );
+        }
+      });
+    });
   });
 }
