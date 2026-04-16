@@ -3,10 +3,19 @@ import 'package:flutter/services.dart';
 import '../../domain/ac_phone_masked.dart';
 
 /// A [TextInputFormatter] that formats phone number input by applying
-/// a fixed mask.
+/// a fixed mask and filtering out every non-digit character typed or
+/// pasted by the user.
 ///
 /// The mask uses `#` as a digit placeholder; any other character is
 /// preserved as a literal separator.
+///
+/// **Digits-only guarantee**: non-digit characters entered by the user
+/// (hardware-keyboard letters, pasted text with mixed content, emoji,
+/// punctuation, unicode whitespace) are stripped before the mask is
+/// applied. Adding a separate [FilteringTextInputFormatter.digitsOnly]
+/// alongside this formatter is unnecessary — [ACPhoneInputFormatter]
+/// already enforces digits-only input. Leaving the extra formatter in
+/// place is harmless (double-filtering is idempotent).
 ///
 /// Example usage:
 /// ```dart
