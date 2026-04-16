@@ -2,6 +2,8 @@
 
 A Flutter library for phone number parsing, validation, formatting and country detection.
 
+[![pub package](https://img.shields.io/pub/v/appcraft_phone_util_flutter.svg)](https://pub.dev/packages/appcraft_phone_util_flutter)
+
 ## Features
 
 - **Phone number parsing** -- detect country and format phone numbers automatically
