@@ -9,6 +9,16 @@ import '../../domain/ac_phone_data.dart';
 ///
 /// Provides reactive access to [phoneData], [isValid], [country]
 /// and [rawPhoneNumber] based on the current text value.
+///
+/// In addition, whenever the detected country's phone code differs from
+/// the leading digits of the current text (for example, a Russian number
+/// entered with the national trunk-prefix `8` such as `89008007060`),
+/// the controller surgically rewrites those leading digits in place with
+/// the digits of the detected country's phone code. Only the first N digit
+/// characters (where N is the length of the phone code without `+`) are
+/// replaced; all other characters, including any mask separators such as
+/// `+`, `(`, `)`, spaces or dashes, are preserved. Masking itself is still
+/// the responsibility of an input formatter (e.g. `ACPhoneInputFormatter`).
 class ACPhoneEditingController extends TextEditingController {
   /// Creates an [ACPhoneEditingController].
   ///
@@ -21,6 +31,18 @@ class ACPhoneEditingController extends TextEditingController {
   }
 
   ACPhoneData? _phoneData;
+
+  /// Memo-guard for [_onTextChanged] storing the last processed text.
+  ///
+  /// Acts as a re-entry guard: when the controller programmatically rewrites
+  /// [text] to replace the trunk-prefix, the listener fires again with the
+  /// just-written value; comparing against [_lastText] short-circuits that
+  /// second pass (infinite recursion guard).
+  ///
+  /// Bonus: if only [selection] changes (text is identical to the previous
+  /// observed value), [_onTextChanged] returns early without invoking
+  /// [ACPhoneUtil.findPhone], avoiding redundant parsing work.
+  String _lastText = '';
 
   /// Current parsed phone data, or `null` if the text does not
   /// contain a recognizable phone number.
@@ -49,9 +71,146 @@ class ACPhoneEditingController extends TextEditingController {
   }
 
   void _onTextChanged() {
+    if (text == _lastText) return;
+    // Track direction of the edit: deletion = new length is less than the
+    // previously observed length. Forward typing (length grew or stayed the
+    // same) must never trigger the plus-auto-removal branch below, otherwise
+    // a user typing `+` as the first character before digits gets that `+`
+    // erased immediately.
+    final wasDeletion = text.length < _lastText.length;
+    _lastText = text;
+
+    // Auto-clear a lingering `+` (optionally with mask separators) once the
+    // last digit is removed, so the field collapses to empty as the user
+    // expects instead of keeping a dangling country-code prefix.
+    //
+    // Guarded by [wasDeletion]: we only collapse to empty when the user is
+    // actively deleting characters. If the `+` appeared by typing (or a
+    // programmatic assignment from an empty state), we leave it alone so
+    // the next keystroke (a digit) can extend it naturally.
+    if (wasDeletion && text.contains('+') && !_hasAnyDigit(text)) {
+      _phoneData = null;
+      _lastText = '';
+      value = TextEditingValue.empty;
+      return;
+    }
+
     _phoneData = ACPhoneUtil.instance.findPhone(
       phoneNumber: text,
     );
+
+    if (_phoneData == null) return;
+
+    final codeDigits = _phoneData!.country.phoneCode.replaceAll(
+      RegExp(r'\D'),
+      '',
+    );
+    if (codeDigits.isEmpty) return;
+
+    final leadingDigits = _firstNDigits(text, codeDigits.length);
+    if (leadingDigits == codeDigits) return;
+
+    _applyTrunkPrefixRewrite(_phoneData!);
+  }
+
+  /// Rewrites the first N digit characters of [text] with the digits of
+  /// [phoneData]'s country phone code, preserving every non-digit character
+  /// as well as any digits beyond the first N.
+  ///
+  /// The caret position is preserved by digit-count: the number of digit
+  /// characters located before the caret in the old [text] is mapped to an
+  /// offset in the new text such that the same number of digits remains to
+  /// the left of the caret. Non-digit mask separators do not affect the
+  /// mapping.
+  ///
+  /// Recursive listener invocations are prevented by [_lastText]: the new
+  /// text is recorded in [_lastText] right before assigning [value], so the
+  /// listener's next call short-circuits in [_onTextChanged].
+  void _applyTrunkPrefixRewrite(ACPhoneData phoneData) {
+    final codeDigits = phoneData.country.phoneCode.replaceAll(
+      RegExp(r'\D'),
+      '',
+    );
+    final oldText = text;
+    final oldOffset = selection.baseOffset;
+
+    final buffer = StringBuffer();
+    var replaced = 0;
+    for (var i = 0; i < oldText.length; i++) {
+      final char = oldText[i];
+      if (_isDigit(char.codeUnitAt(0)) && replaced < codeDigits.length) {
+        buffer.write(codeDigits[replaced]);
+        replaced++;
+      } else {
+        buffer.write(char);
+      }
+    }
+    final newText = buffer.toString();
+
+    final int newOffset;
+    if (oldOffset < 0 || oldOffset > oldText.length) {
+      newOffset = newText.length;
+    } else {
+      final digitsBefore = _countDigits(oldText, oldOffset);
+      newOffset = _mapCursorByDigitCount(newText, digitsBefore);
+    }
+
+    _lastText = newText;
+    value = TextEditingValue(
+      text: newText,
+      selection: TextSelection.collapsed(offset: newOffset),
+    );
+  }
+
+  /// Returns the first [n] digit characters of [source] as a string.
+  ///
+  /// If [source] contains fewer than [n] digits, the returned string
+  /// contains all digits found.
+  String _firstNDigits(String source, int n) {
+    final buffer = StringBuffer();
+    for (var i = 0; i < source.length && buffer.length < n; i++) {
+      final char = source[i];
+      if (_isDigit(char.codeUnitAt(0))) {
+        buffer.write(char);
+      }
+    }
+    return buffer.toString();
+  }
+
+  /// Whether [codeUnit] is an ASCII digit (`0`-`9`).
+  bool _isDigit(int codeUnit) => codeUnit >= 0x30 && codeUnit <= 0x39;
+
+  /// Whether [source] contains at least one ASCII digit (`0`-`9`).
+  bool _hasAnyDigit(String source) {
+    for (var i = 0; i < source.length; i++) {
+      if (_isDigit(source.codeUnitAt(i))) return true;
+    }
+    return false;
+  }
+
+  /// Counts digit characters in [source] within `[0, end)`.
+  int _countDigits(String source, int end) {
+    final limit = end > source.length ? source.length : end;
+    var count = 0;
+    for (var i = 0; i < limit; i++) {
+      if (_isDigit(source.codeUnitAt(i))) count++;
+    }
+    return count;
+  }
+
+  /// Returns the offset in [newText] located immediately after the
+  /// [digitsBefore]-th digit. If [newText] contains fewer digits, returns
+  /// [String.length] of [newText].
+  int _mapCursorByDigitCount(String newText, int digitsBefore) {
+    if (digitsBefore <= 0) return 0;
+    var count = 0;
+    for (var i = 0; i < newText.length; i++) {
+      if (_isDigit(newText.codeUnitAt(i))) {
+        count++;
+        if (count == digitsBefore) return i + 1;
+      }
+    }
+    return newText.length;
   }
 
   @override
