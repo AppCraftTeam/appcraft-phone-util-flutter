@@ -36,16 +36,35 @@ class ACPhoneInputFormatter extends TextInputFormatter {
       return newValue;
     }
 
-    final digits = newValue.text.replaceAll(_nonDigitRegExp, '');
+    var digits = newValue.text.replaceAll(_nonDigitRegExp, '');
 
     if (digits.isEmpty) {
       return TextEditingValue.empty;
     }
 
-    final digitsBeforeCursor = _countDigitsBeforeOffset(
+    var digitsBeforeCursor = _countDigitsBeforeOffset(
       newValue.text,
       newValue.selection.baseOffset,
     );
+
+    // Backspace-through-separator: the framework proposed a shorter text but
+    // the digit count is unchanged, meaning only a mask separator was
+    // removed. Without intervention the mask re-adds the separator and the
+    // keystroke appears ineffective. Manually drop the digit immediately
+    // before the cursor so backspace on any character performs a real
+    // deletion.
+    final oldDigits = oldValue.text.replaceAll(_nonDigitRegExp, '');
+    if (oldDigits.length == digits.length &&
+        newValue.text.length < oldValue.text.length &&
+        digitsBeforeCursor > 0) {
+      final removeIndex = digitsBeforeCursor - 1;
+      digits =
+          digits.substring(0, removeIndex) + digits.substring(removeIndex + 1);
+      digitsBeforeCursor -= 1;
+      if (digits.isEmpty) {
+        return TextEditingValue.empty;
+      }
+    }
 
     final rawFormatted = ACPhoneMasked.setMask(
       mask,
@@ -80,6 +99,8 @@ class ACPhoneInputFormatter extends TextInputFormatter {
     return count;
   }
 
+  /// Returns the offset in [formattedText] right after the [digitCount]-th
+  /// digit, or [String.length] if fewer digits are present.
   int _mapCursorPosition(String formattedText, int digitCount) {
     if (digitCount <= 0) {
       return 0;
@@ -89,15 +110,7 @@ class ACPhoneInputFormatter extends TextInputFormatter {
       if (_isDigit(formattedText[i])) {
         count++;
         if (count >= digitCount) {
-          // Skip any trailing mask separators (space, (, ), -, etc.) after
-          // the Nth digit so the cursor lands right before the next digit
-          // slot. This avoids visual cursor jumps through separators when
-          // the user edits around parentheses or dashes.
-          var j = i + 1;
-          while (j < formattedText.length && !_isDigit(formattedText[j])) {
-            j++;
-          }
-          return j;
+          return i + 1;
         }
       }
     }

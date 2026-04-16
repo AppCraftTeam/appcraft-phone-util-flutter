@@ -207,15 +207,7 @@ class ACPhoneEditingController extends TextEditingController {
     for (var i = 0; i < newText.length; i++) {
       if (_isDigit(newText.codeUnitAt(i))) {
         count++;
-        if (count == digitsBefore) {
-          // Skip trailing mask separators so the cursor lands before the
-          // next digit slot — consistent with ACPhoneInputFormatter policy.
-          var j = i + 1;
-          while (j < newText.length && !_isDigit(newText.codeUnitAt(j))) {
-            j++;
-          }
-          return j;
-        }
+        if (count == digitsBefore) return i + 1;
       }
     }
     return newText.length;

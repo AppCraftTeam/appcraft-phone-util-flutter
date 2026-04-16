@@ -141,11 +141,11 @@ void main() {
       });
     });
 
-    group('cursor after mask separators (Bug 1)', () {
+    group('backspace through separators (Bug 5 fix)', () {
       test(
-        'удаление ( из +7 (900) 999-88-77 — курсор не прыгает к началу скобки',
+        'backspace после ( в +7 (900) 999-88-77 удаляет цифру 7, число перестраивается',
         () {
-          // Arrange
+          // Arrange — курсор сразу после `(`
           final formatter = ACPhoneInputFormatter(
             mask: '+# (###) ###-##-##',
           );
@@ -153,8 +153,7 @@ void main() {
             text: '+7 (900) 999-88-77',
             selection: TextSelection.collapsed(offset: 4),
           );
-          // Эмуляция: пользователь нажал backspace, находясь сразу после `(`.
-          // Framework предлагает removeAt(3) → text без `(`.
+          // Framework предлагает удалить `(`
           const newValue = TextEditingValue(
             text: '+7 900) 999-88-77',
             selection: TextSelection.collapsed(offset: 3),
@@ -163,41 +162,81 @@ void main() {
           // Act
           final result = formatter.formatEditUpdate(oldValue, newValue);
 
-          // Assert: текст восстанавливается маской до полной формы
-          expect(result.text, '+7 (900) 999-88-77');
-          // Курсор не должен «прыгать» к позиции 2 (сразу после `7`).
-          // После первой цифры стоят разделители ` (`, значит логичная
-          // позиция для продолжения ввода — offset 4 (сразу после `(`),
-          // т.е. сразу перед следующим digit-слотом.
-          expect(
-            result.selection.baseOffset,
-            4,
-            reason:
-                'курсор должен приземлиться перед следующим digit-слотом (offset 4), '
-                'а не сразу после первой цифры (offset 2)',
-          );
+          // Assert — цифра 7 удалена, осталось 10 цифр
+          final digitsOnly = result.text.replaceAll(RegExp(r'\D'), '');
+          expect(digitsOnly.length, 10);
+          expect(digitsOnly, '9009998877');
         },
       );
 
       test(
-        'после 1 цифры в пустом вводе курсор в конце +7 (без trailing разделителей)',
+        'backspace на каждом сепараторе ((, ), -, пробел) удаляет одну цифру',
         () {
-          // Arrange
+          // Arrange: номер +7 (900) 999-88-77 с cursor сразу после разных сепараторов
           final formatter = ACPhoneInputFormatter(
             mask: '+# (###) ###-##-##',
           );
-          const oldValue = TextEditingValue.empty;
-          const newValue = TextEditingValue(
-            text: '7',
+
+          // Mapping: сепаратор → offset сразу после него.
+          // Рассматриваем только позиции, где перед курсором есть хотя бы
+          // одна цифра (backspace на `+` в offset=1 — отдельный сценарий,
+          // см. тест ниже про digitsBeforeCursor == 0).
+          // space at 2 → offset 3, ( at 3 → offset 4,
+          // ) at 7 → offset 8, space at 8 → offset 9, - at 12 → offset 13,
+          // - at 15 → offset 16.
+          final separatorOffsets = <int>[3, 4, 8, 9, 13, 16];
+
+          for (final sepOffset in separatorOffsets) {
+            const oldText = '+7 (900) 999-88-77';
+            final oldValue = TextEditingValue(
+              text: oldText,
+              selection: TextSelection.collapsed(offset: sepOffset),
+            );
+            // Эмулируем backspace: удаляем char по индексу sepOffset - 1
+            final newText = oldText.substring(0, sepOffset - 1) +
+                oldText.substring(sepOffset);
+            final newValue = TextEditingValue(
+              text: newText,
+              selection: TextSelection.collapsed(offset: sepOffset - 1),
+            );
+
+            // Act
+            final result = formatter.formatEditUpdate(oldValue, newValue);
+
+            // Assert — одна цифра удалилась
+            final digitsOnly = result.text.replaceAll(RegExp(r'\D'), '');
+            expect(
+              digitsOnly.length,
+              10,
+              reason:
+                  'backspace на offset $sepOffset должен удалить 1 цифру из 11',
+            );
+          }
+        },
+      );
+
+      test(
+        'backspace при digitsBeforeCursor == 0 (курсор перед первой цифрой) не ломается',
+        () {
+          final formatter = ACPhoneInputFormatter(
+            mask: '+# (###) ###-##-##',
+          );
+          const oldValue = TextEditingValue(
+            text: '+7',
             selection: TextSelection.collapsed(offset: 1),
           );
+          // Backspace на `+` — ничего перед курсором, но framework всё равно
+          // может предложить удаление. Проверим что не крашится и не теряется цифра.
+          const newValue = TextEditingValue(
+            text: '7',
+            selection: TextSelection.collapsed(offset: 0),
+          );
 
-          // Act
           final result = formatter.formatEditUpdate(oldValue, newValue);
 
-          // Assert — после trim-фикса Bug 4 trailing разделители ' (' обрезаны
+          // Формateер должен корректно отработать — `+` восстановится, цифра 7 на месте.
+          // digitsBeforeCursor=0 → delete-through-separator не срабатывает.
           expect(result.text, '+7');
-          expect(result.selection.baseOffset, 2);
         },
       );
     });
