@@ -32,12 +32,17 @@ class ACPhoneEditingController extends TextEditingController {
 
   ACPhoneData? _phoneData;
 
-  /// Re-entry guard for [_onTextChanged].
+  /// Memo-guard for [_onTextChanged] storing the last processed text.
   ///
-  /// When the controller programmatically rewrites [text] to replace the
-  /// trunk-prefix, the listener fires again. This flag prevents a second
-  /// rewrite pass inside the same cycle (infinite recursion guard).
-  bool _isRewriting = false;
+  /// Acts as a re-entry guard: when the controller programmatically rewrites
+  /// [text] to replace the trunk-prefix, the listener fires again with the
+  /// just-written value; comparing against [_lastText] short-circuits that
+  /// second pass (infinite recursion guard).
+  ///
+  /// Bonus: if only [selection] changes (text is identical to the previous
+  /// observed value), [_onTextChanged] returns early without invoking
+  /// [ACPhoneUtil.findPhone], avoiding redundant parsing work.
+  String _lastText = '';
 
   /// Current parsed phone data, or `null` if the text does not
   /// contain a recognizable phone number.
@@ -66,7 +71,29 @@ class ACPhoneEditingController extends TextEditingController {
   }
 
   void _onTextChanged() {
-    if (_isRewriting) return;
+    if (text == _lastText) return;
+    // Track direction of the edit: deletion = new length is less than the
+    // previously observed length. Forward typing (length grew or stayed the
+    // same) must never trigger the plus-auto-removal branch below, otherwise
+    // a user typing `+` as the first character before digits gets that `+`
+    // erased immediately.
+    final wasDeletion = text.length < _lastText.length;
+    _lastText = text;
+
+    // Auto-clear a lingering `+` (optionally with mask separators) once the
+    // last digit is removed, so the field collapses to empty as the user
+    // expects instead of keeping a dangling country-code prefix.
+    //
+    // Guarded by [wasDeletion]: we only collapse to empty when the user is
+    // actively deleting characters. If the `+` appeared by typing (or a
+    // programmatic assignment from an empty state), we leave it alone so
+    // the next keystroke (a digit) can extend it naturally.
+    if (wasDeletion && text.contains('+') && !_hasAnyDigit(text)) {
+      _phoneData = null;
+      _lastText = '';
+      value = TextEditingValue.empty;
+      return;
+    }
 
     _phoneData = ACPhoneUtil.instance.findPhone(
       phoneNumber: text,
@@ -96,7 +123,9 @@ class ACPhoneEditingController extends TextEditingController {
   /// the left of the caret. Non-digit mask separators do not affect the
   /// mapping.
   ///
-  /// Guarded by [_isRewriting] to avoid recursive listener invocations.
+  /// Recursive listener invocations are prevented by [_lastText]: the new
+  /// text is recorded in [_lastText] right before assigning [value], so the
+  /// listener's next call short-circuits in [_onTextChanged].
   void _applyTrunkPrefixRewrite(ACPhoneData phoneData) {
     final codeDigits = phoneData.country.phoneCode.replaceAll(
       RegExp(r'\D'),
@@ -126,15 +155,11 @@ class ACPhoneEditingController extends TextEditingController {
       newOffset = _mapCursorByDigitCount(newText, digitsBefore);
     }
 
-    _isRewriting = true;
-    try {
-      value = TextEditingValue(
-        text: newText,
-        selection: TextSelection.collapsed(offset: newOffset),
-      );
-    } finally {
-      _isRewriting = false;
-    }
+    _lastText = newText;
+    value = TextEditingValue(
+      text: newText,
+      selection: TextSelection.collapsed(offset: newOffset),
+    );
   }
 
   /// Returns the first [n] digit characters of [source] as a string.
@@ -155,6 +180,14 @@ class ACPhoneEditingController extends TextEditingController {
   /// Whether [codeUnit] is an ASCII digit (`0`-`9`).
   bool _isDigit(int codeUnit) => codeUnit >= 0x30 && codeUnit <= 0x39;
 
+  /// Whether [source] contains at least one ASCII digit (`0`-`9`).
+  bool _hasAnyDigit(String source) {
+    for (var i = 0; i < source.length; i++) {
+      if (_isDigit(source.codeUnitAt(i))) return true;
+    }
+    return false;
+  }
+
   /// Counts digit characters in [source] within `[0, end)`.
   int _countDigits(String source, int end) {
     final limit = end > source.length ? source.length : end;
@@ -174,7 +207,15 @@ class ACPhoneEditingController extends TextEditingController {
     for (var i = 0; i < newText.length; i++) {
       if (_isDigit(newText.codeUnitAt(i))) {
         count++;
-        if (count == digitsBefore) return i + 1;
+        if (count == digitsBefore) {
+          // Skip trailing mask separators so the cursor lands before the
+          // next digit slot — consistent with ACPhoneInputFormatter policy.
+          var j = i + 1;
+          while (j < newText.length && !_isDigit(newText.codeUnitAt(j))) {
+            j++;
+          }
+          return j;
+        }
       }
     }
     return newText.length;

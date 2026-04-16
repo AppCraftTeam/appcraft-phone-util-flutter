@@ -11,6 +11,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `ACPhoneEditingController`: при изменении `text` автоматически заменяет цифры trunk-prefix на цифры реального `phoneCode` детектированной страны. Например, ввод `89008007060` без форматтера даёт `text = '79008007060'` (country = RU); с `ACPhoneInputFormatter(mask: '+# (###) ###-##-##')` — `+7 (900) 800-70-60`. Замена хирургическая: трогает только первые N digit-символов (N = длина digits-версии `phoneCode`), сохраняет маску/разделители и позицию курсора по digit-count. Для номеров, где trunk-prefix уже совпадает с `phoneCode` (`+79...`, `+380...`), rewrite не вызывается. Маскирование по-прежнему целиком ответственность форматтера.
 
+### Fixed
+
+- `ACPhoneInputFormatter`: правильная позиция курсора при удалении через маску-разделитель (backspace через `(`, `)`, пробелы).
+- `ACPhoneEditingController`: автоматическое удаление одинокого `+` при стирании последней цифры номера.
+
+### Refactored
+
+- `ACPhoneEditingController`: замена `_isRewriting` на `_lastText` — memo-guard + экономия `findPhone` при изменении только selection.
+
 ## [1.0.0] - 2026-04-14
 
 ### BREAKING CHANGES

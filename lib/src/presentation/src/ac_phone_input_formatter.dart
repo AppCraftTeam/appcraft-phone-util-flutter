@@ -83,7 +83,15 @@ class ACPhoneInputFormatter extends TextInputFormatter {
       if (_isDigit(formattedText[i])) {
         count++;
         if (count >= digitCount) {
-          return i + 1;
+          // Skip any trailing mask separators (space, (, ), -, etc.) after
+          // the Nth digit so the cursor lands right before the next digit
+          // slot. This avoids visual cursor jumps through separators when
+          // the user edits around parentheses or dashes.
+          var j = i + 1;
+          while (j < formattedText.length && !_isDigit(formattedText[j])) {
+            j++;
+          }
+          return j;
         }
       }
     }

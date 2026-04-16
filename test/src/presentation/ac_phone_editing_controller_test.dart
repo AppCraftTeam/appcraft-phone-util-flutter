@@ -508,7 +508,10 @@ void main() {
         () {
           // Проверяем, что для неполных вводов (когда findPhone возвращает null)
           // rewrite не срабатывает: текст остаётся прежним, country=null.
-          for (final input in ['8', '7', '+', '+7']) {
+          // Одиночный '+' здесь — это forward-typing (_lastText='' → '+'),
+          // авто-очистка срабатывает только при удалении (wasDeletion=true)
+          // и покрыта отдельно в группе 'plus auto-removal (Bug 2)'.
+          for (final input in ['8', '7', '+7', '+']) {
             // Arrange
             final controller = ACPhoneEditingController();
 
@@ -658,6 +661,66 @@ void main() {
           controller.dispose();
         },
       );
+    });
+
+    group('plus auto-removal (Bug 2)', () {
+      test('+7 без цифр после удаления последней цифры → text очищается до пустого', () {
+        // Arrange
+        final controller = ACPhoneEditingController(
+          initialPhoneNumber: '+7',
+        );
+
+        // Act — эмулируем backspace на цифре 7 (курсор в конце)
+        controller.value = const TextEditingValue(
+          text: '+',
+          selection: TextSelection.collapsed(offset: 1),
+        );
+
+        // Assert — + должен автоматически удалиться
+        expect(controller.text, isEmpty);
+
+        // Cleanup
+        controller.dispose();
+      });
+
+      test('+ без цифр и с маской-разделителями → text очищается до пустого', () {
+        // Arrange
+        final controller = ACPhoneEditingController(
+          initialPhoneNumber: '+79008007060',
+        );
+
+        // Act — эмулируем состояние "только + с пробелом" (возможно после formatter)
+        controller.value = const TextEditingValue(
+          text: '+ ',
+          selection: TextSelection.collapsed(offset: 2),
+        );
+
+        // Assert
+        expect(controller.text, isEmpty);
+
+        // Cleanup
+        controller.dispose();
+      });
+
+      test('+79008007060 остаётся без изменений — есть цифры', () {
+        // Регрессионный тест: логика автоудаления + не должна
+        // срабатывать, пока в тексте есть цифры.
+        // Arrange
+        final controller = ACPhoneEditingController();
+
+        // Act
+        controller.value = const TextEditingValue(
+          text: '+79008007060',
+          selection: TextSelection.collapsed(offset: 12),
+        );
+
+        // Assert
+        expect(controller.text, '+79008007060');
+        expect(controller.country?.isoCode, 'RU');
+
+        // Cleanup
+        controller.dispose();
+      });
     });
   });
 }

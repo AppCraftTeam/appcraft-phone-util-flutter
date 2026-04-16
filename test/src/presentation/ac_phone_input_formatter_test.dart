@@ -140,5 +140,66 @@ void main() {
         expect(result.selection.baseOffset, 6);
       });
     });
+
+    group('cursor after mask separators (Bug 1)', () {
+      test(
+        'удаление ( из +7 (900) 999-88-77 — курсор не прыгает к началу скобки',
+        () {
+          // Arrange
+          final formatter = ACPhoneInputFormatter(
+            mask: '+# (###) ###-##-##',
+          );
+          const oldValue = TextEditingValue(
+            text: '+7 (900) 999-88-77',
+            selection: TextSelection.collapsed(offset: 4),
+          );
+          // Эмуляция: пользователь нажал backspace, находясь сразу после `(`.
+          // Framework предлагает removeAt(3) → text без `(`.
+          const newValue = TextEditingValue(
+            text: '+7 900) 999-88-77',
+            selection: TextSelection.collapsed(offset: 3),
+          );
+
+          // Act
+          final result = formatter.formatEditUpdate(oldValue, newValue);
+
+          // Assert: текст восстанавливается маской до полной формы
+          expect(result.text, '+7 (900) 999-88-77');
+          // Курсор не должен «прыгать» к позиции 2 (сразу после `7`).
+          // После первой цифры стоят разделители ` (`, значит логичная
+          // позиция для продолжения ввода — offset 4 (сразу после `(`),
+          // т.е. сразу перед следующим digit-слотом.
+          expect(
+            result.selection.baseOffset,
+            4,
+            reason:
+                'курсор должен приземлиться перед следующим digit-слотом (offset 4), '
+                'а не сразу после первой цифры (offset 2)',
+          );
+        },
+      );
+
+      test(
+        'после 1 цифры в пустом вводе курсор в конце, не перед открывающей скобкой',
+        () {
+          // Arrange
+          final formatter = ACPhoneInputFormatter(
+            mask: '+# (###) ###-##-##',
+          );
+          const oldValue = TextEditingValue.empty;
+          const newValue = TextEditingValue(
+            text: '7',
+            selection: TextSelection.collapsed(offset: 1),
+          );
+
+          // Act
+          final result = formatter.formatEditUpdate(oldValue, newValue);
+
+          // Assert
+          expect(result.text, '+7 (');
+          expect(result.selection.baseOffset, 4);
+        },
+      );
+    });
   });
 }
