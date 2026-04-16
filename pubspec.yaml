@@ -1,7 +1,20 @@
 name: appcraft_phone_util_flutter
-description: A flutter package to select a country from a list of countries.
+description: >-
+  Flutter library for phone number parsing, validation, formatting,
+  country detection (200+ countries) and input masking via
+  ACPhoneInputFormatter and ACPhoneEditingController.
 
-version: 1.1.0
+version: 1.1.1
+
+repository: https://github.com/AppCraftTeam/appcraft-phone-util-flutter
+homepage: https://github.com/AppCraftTeam/appcraft-phone-util-flutter
+issue_tracker: https://github.com/AppCraftTeam/appcraft-phone-util-flutter/issues
+
+topics:
+  - phone
+  - input
+  - formatter
+  - validation
 
 environment:
   sdk: '>=2.14.0 <4.0.0'

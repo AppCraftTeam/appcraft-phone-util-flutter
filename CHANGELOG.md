@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.1] - 2026-04-16
+
+### Added
+
+- `LICENSE` файл (MIT) в корне пакета — необходимое условие для публикации на pub.dev.
+- `lib/appcraft_phone_util_flutter.dart` — canonical entry-point, соответствующий имени пакета. Эквивалентен существующему `lib/ac_phone_util.dart` (re-export).
+
+### Changed
+
+- `pubspec.yaml`: добавлены поля `repository`, `homepage`, `issue_tracker`, `topics`.
+- `pubspec.yaml`: `description` расширено — точно отражает функциональность пакета (parsing, validation, formatting, country detection, input masking).
+- `README.md`: инструкция установки через `flutter pub add` как primary; git-источник сохранён как secondary `## From source`.
+
+### Notes
+
+- Существующие импорты `import 'package:appcraft_phone_util_flutter/ac_phone_util.dart';` продолжают работать без изменений — обратная совместимость гарантирована smoke-тестом `canonical_entry_point_test.dart`.
+- Runtime behavior не изменён — только metadata и структура publish artifact. Первая публикация на pub.dev.
+
 ## [1.1.0] - 2026-04-16
 
 ### Added

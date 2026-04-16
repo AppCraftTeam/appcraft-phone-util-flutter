@@ -13,7 +13,20 @@ A Flutter library for phone number parsing, validation, formatting and country d
 
 ## Installation
 
-Add the dependency to your `pubspec.yaml`:
+### From pub.dev (recommended)
+
+```bash
+flutter pub add appcraft_phone_util_flutter
+```
+
+Or add to `pubspec.yaml` manually:
+
+```yaml
+dependencies:
+  appcraft_phone_util_flutter: ^1.1.1
+```
+
+### From source
 
 ```yaml
 dependencies:
