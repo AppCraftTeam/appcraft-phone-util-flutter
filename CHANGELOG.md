@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-04-16
+
+### Added
+
+- Экспорт класса `ACPhoneCountries` из `ac_phone_util.dart` — публичный доступ к реестру поддерживаемых стран (`ACPhoneCountries.instance.all`, `.instance.hashedCountries`). Ранее класс был доступен только через `lib/src/`.
+
+### Fixed
+
+- Info-предупреждение analyzer'а `include_file_not_found` для `package:flutter_lints/flutter.yaml` в `example/`: добавлен `flutter_lints: ^3.0.0` в `dev_dependencies` `example/pubspec.yaml`.
+- Warning `dart pub publish --dry-run` о «checked-in files are ignored by a .gitignore»:
+  - `pubspec.lock` убран из индекса git (library-convention — lockfile не коммитится);
+  - `.vscode/` убран из `.gitignore` (launch.json коммитится для команды), исключён из published package через новый `.pubignore`.
+- Lint `implementation_imports` в `example/lib/national_phone_demo_page.dart`: импорт переведён на публичный entry-point после экспорта `ACPhoneCountries`.
+
+### Notes
+
+- Существующие импорты `import 'package:appcraft_phone_util_flutter/ac_phone_util.dart';` продолжают работать.
+- Runtime-поведение библиотеки не изменено — только расширен публичный API и починены dev-окружение + publish-pipeline.
+
 ## [1.1.1] - 2026-04-16
 
 ### Added

@@ -13,7 +13,8 @@ coverage/
 
 # IDE
 .idea/
-.vscode/
+# .vscode/ не игнорируется: launch.json коммитится для команды.
+# Из published package .vscode/ исключается через .pubignore.
 
 # OS
 .DS_Store

@@ -1,0 +1,2 @@
+# Исключить IDE-конфиг из published package (файлы остаются в git для команды).
+.vscode/
