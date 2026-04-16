@@ -180,7 +180,7 @@ void main() {
       );
 
       test(
-        'после 1 цифры в пустом вводе курсор в конце, не перед открывающей скобкой',
+        'после 1 цифры в пустом вводе курсор в конце +7 (без trailing разделителей)',
         () {
           // Arrange
           final formatter = ACPhoneInputFormatter(
@@ -195,9 +195,126 @@ void main() {
           // Act
           final result = formatter.formatEditUpdate(oldValue, newValue);
 
-          // Assert
-          expect(result.text, '+7 (');
-          expect(result.selection.baseOffset, 4);
+          // Assert — после trim-фикса Bug 4 trailing разделители ' (' обрезаны
+          expect(result.text, '+7');
+          expect(result.selection.baseOffset, 2);
+        },
+      );
+    });
+
+    group('trailing separators trimmed (Bug 4 fix)', () {
+      test(
+        '1 цифра 7 → text без trailing ( и пробела',
+        () {
+          // Arrange
+          final formatter = ACPhoneInputFormatter(
+            mask: '+# (###) ###-##-##',
+          );
+          const oldValue = TextEditingValue.empty;
+          const newValue = TextEditingValue(
+            text: '7',
+            selection: TextSelection.collapsed(offset: 1),
+          );
+
+          // Act
+          final result = formatter.formatEditUpdate(oldValue, newValue);
+
+          // Assert — trailing разделители ' (' обрезаны
+          expect(result.text, '+7');
+          expect(result.selection.baseOffset, 2);
+        },
+      );
+
+      test(
+        '4 цифры 7900 → text +7 (900 без trailing )',
+        () {
+          // Arrange
+          final formatter = ACPhoneInputFormatter(
+            mask: '+# (###) #-##-##',
+          );
+          // Эмулируем ручной ввод 4 цифр последовательно, финальное состояние:
+          const oldValue = TextEditingValue(
+            text: '+7 (90',
+            selection: TextSelection.collapsed(offset: 6),
+          );
+          const newValue = TextEditingValue(
+            text: '+7 (900',
+            selection: TextSelection.collapsed(offset: 7),
+          );
+
+          // Act
+          final result = formatter.formatEditUpdate(oldValue, newValue);
+
+          // Assert — trailing ')' должен быть обрезан
+          expect(result.text, '+7 (900');
+          expect(result.selection.baseOffset, 7);
+        },
+      );
+
+      test(
+        'backspace после 4 цифр успешно удаляет последнюю цифру',
+        () {
+          // Arrange — пользователь видит +7 (900 (после фикса trim) и жмёт backspace
+          final formatter = ACPhoneInputFormatter(
+            mask: '+# (###) ###-##-##',
+          );
+          const oldValue = TextEditingValue(
+            text: '+7 (900',
+            selection: TextSelection.collapsed(offset: 7),
+          );
+          // Framework предлагает удалить последний символ (цифра 0) — offset 6
+          const newValue = TextEditingValue(
+            text: '+7 (90',
+            selection: TextSelection.collapsed(offset: 6),
+          );
+
+          // Act
+          final result = formatter.formatEditUpdate(oldValue, newValue);
+
+          // Assert — цифра реально удалилась (digits сократились с 4 до 3)
+          final digitCount = result.text.replaceAll(RegExp(r'\D'), '').length;
+          expect(
+            digitCount,
+            3,
+            reason: 'после backspace должна остаться 3 цифры, а не 4 (не залипать)',
+          );
+          // И текст короче, чем был
+          expect(result.text.length, lessThan(oldValue.text.length));
+        },
+      );
+    });
+
+    group('no stuck deletion (Bug 4 regression)', () {
+      test(
+        'ввод 1 цифры и backspace возвращает пустое поле',
+        () {
+          // Arrange
+          final formatter = ACPhoneInputFormatter(
+            mask: '+# (###) ###-##-##',
+          );
+          // Шаг 1: ввод одной цифры
+          const step1Old = TextEditingValue.empty;
+          const step1New = TextEditingValue(
+            text: '7',
+            selection: TextSelection.collapsed(offset: 1),
+          );
+          final step1Result = formatter.formatEditUpdate(step1Old, step1New);
+          // После фикса ожидаем '+7' (без trailing разделителей)
+
+          // Act: backspace в конце
+          final step2New = TextEditingValue(
+            text: step1Result.text.substring(
+              0,
+              step1Result.selection.baseOffset - 1,
+            ),
+            selection: TextSelection.collapsed(
+              offset: step1Result.selection.baseOffset - 1,
+            ),
+          );
+          final step2Result = formatter.formatEditUpdate(step1Result, step2New);
+
+          // Assert — поле должно полностью очиститься (digits.isEmpty → TextEditingValue.empty)
+          expect(step2Result.text, isEmpty);
         },
       );
     });

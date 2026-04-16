@@ -47,10 +47,16 @@ class ACPhoneInputFormatter extends TextInputFormatter {
       newValue.selection.baseOffset,
     );
 
-    final formattedText = ACPhoneMasked.setMask(
+    final rawFormatted = ACPhoneMasked.setMask(
       mask,
       rawPhone: digits,
     ).maskedPhone;
+
+    // Trim trailing non-digit characters. Masks add placeholders/literals
+    // after the last typed digit (e.g. `+7 (`), which causes a stuck-delete
+    // UX: backspace erases a separator and the mask re-adds it. Trimming
+    // keeps the cursor usable at the end for both typing and deletion.
+    final formattedText = _trimTrailingNonDigits(rawFormatted);
 
     final cursorOffset = _mapCursorPosition(
       formattedText,
@@ -100,4 +106,17 @@ class ACPhoneInputFormatter extends TextInputFormatter {
 
   bool _isDigit(String char) =>
     char.codeUnitAt(0) >= 48 && char.codeUnitAt(0) <= 57;
+
+  /// Trims trailing characters that are not digits.
+  ///
+  /// Ensures the last character of the returned string is a digit (or the
+  /// string is empty), removing any separator padding the mask appended
+  /// after the last typed digit.
+  String _trimTrailingNonDigits(String source) {
+    var end = source.length;
+    while (end > 0 && !_isDigit(source[end - 1])) {
+      end--;
+    }
+    return source.substring(0, end);
+  }
 }

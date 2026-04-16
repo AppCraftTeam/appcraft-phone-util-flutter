@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `ACPhoneInputFormatter`: правильная позиция курсора при удалении через маску-разделитель (backspace через `(`, `)`, пробелы).
 - `ACPhoneEditingController`: автоматическое удаление одинокого `+` при стирании последней цифры номера.
+- `ACPhoneInputFormatter`: обрезка trailing-разделителей после последней цифры — устраняет залипание при удалении (+7, +7 (900) и аналогичных партиальных состояниях).
 
 ### Refactored
 
