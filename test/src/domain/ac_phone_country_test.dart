@@ -1,5 +1,4 @@
 import 'package:appcraft_phone_util_flutter/ac_phone_util.dart';
-import 'package:appcraft_phone_util_flutter/src/data/ac_phone_countries.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 int _countHashes(String s) => s.split('').where((c) => c == '#').length;
