@@ -4,7 +4,7 @@ description: >-
   country detection (200+ countries) and input masking via
   ACPhoneInputFormatter and ACPhoneEditingController.
 
-version: 1.2.1
+version: 1.2.2
 
 repository: https://github.com/AppCraftTeam/appcraft-phone-util-flutter
 homepage: https://github.com/AppCraftTeam/appcraft-phone-util-flutter
