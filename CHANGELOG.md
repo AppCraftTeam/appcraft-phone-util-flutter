@@ -33,8 +33,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Internal
 
 - Added `.github/workflows/publish.yml` for automated publishing
-  to pub.dev on git tag `v*` push. Uses OIDC authentication via the
-  reusable `dart-lang/setup-dart/.github/workflows/publish.yml@v1`
+  to pub.dev on git tag `X.Y.Z` push (no `v` prefix, matching the
+  existing tag convention of the package). Uses OIDC authentication
+  via the reusable `dart-lang/setup-dart/.github/workflows/publish.yml@v1`
   workflow; no long-lived `PUB_TOKEN` secret required. Pre-publish
   steps run `dart analyze --fatal-infos --fatal-warnings` and
   `flutter test`; the version in `pubspec.yaml` is verified to match
