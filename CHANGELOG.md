@@ -11,6 +11,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- `.github/workflows/publish.yml` trigger pattern was
+  `v[0-9]+.[0-9]+.[0-9]+*` but the package convention uses bare
+  semver tags (e.g., `1.2.0`, not `v1.2.0`). With the original
+  pattern, pushing a release tag would not trigger the publish
+  workflow. Trigger updated to `[0-9]+.[0-9]+.[0-9]+*`.
+- `verify-version` job no longer strips a leading `v` from the
+  tag name (`TAG="${GITHUB_REF_NAME}"` instead of
+  `TAG="${GITHUB_REF_NAME#v}"`) — tag is now compared to
+  `pubspec.yaml:version` exactly.
+
+## [1.2.1]
+
+### Fixed
+
 - Dangling library doc comment in
   `lib/src/presentation/ac_phone_presentation.dart` causing pub.dev
   static analysis penalty (analyzer info `dangling_library_doc_comments`).
@@ -33,9 +47,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Internal
 
 - Added `.github/workflows/publish.yml` for automated publishing
-  to pub.dev on git tag `X.Y.Z` push (no `v` prefix, matching the
-  existing tag convention of the package). Uses OIDC authentication
-  via the reusable `dart-lang/setup-dart/.github/workflows/publish.yml@v1`
+  to pub.dev on git tag push. Uses OIDC authentication via the
+  reusable `dart-lang/setup-dart/.github/workflows/publish.yml@v1`
   workflow; no long-lived `PUB_TOKEN` secret required. Pre-publish
   steps run `dart analyze --fatal-infos --fatal-warnings` and
   `flutter test`; the version in `pubspec.yaml` is verified to match
