@@ -1,0 +1,42 @@
+name: Publish to pub.dev
+
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+*'
+
+jobs:
+  test:
+    name: Analyze & Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - run: flutter pub get
+      - run: dart analyze --fatal-infos --fatal-warnings
+      - run: flutter test
+
+  verify-version:
+    name: Verify pubspec version matches tag
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compare tag vs pubspec.yaml
+        run: |
+          TAG="${GITHUB_REF_NAME#v}"
+          PUBSPEC=$(grep '^version:' pubspec.yaml | awk '{print $2}')
+          if [ "$TAG" != "$PUBSPEC" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME does not match pubspec version $PUBSPEC"
+            exit 1
+          fi
+          echo "OK: tag $GITHUB_REF_NAME matches pubspec version $PUBSPEC"
+
+  publish:
+    name: Publish to pub.dev
+    needs: [test, verify-version]
+    permissions:
+      id-token: write
+    uses: dart-lang/setup-dart/.github/workflows/publish.yml@v1
