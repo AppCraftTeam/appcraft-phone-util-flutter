@@ -7,83 +7,179 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [1.2.0] - 2026-04-16
-
-### Added
-
-- Экспорт класса `ACPhoneCountries` из `ac_phone_util.dart` — публичный доступ к реестру поддерживаемых стран (`ACPhoneCountries.instance.all`, `.instance.hashedCountries`). Ранее класс был доступен только через `lib/src/`.
+## [1.2.1]
 
 ### Fixed
 
-- Info-предупреждение analyzer'а `include_file_not_found` для `package:flutter_lints/flutter.yaml` в `example/`: добавлен `flutter_lints: ^3.0.0` в `dev_dependencies` `example/pubspec.yaml`.
-- Warning `dart pub publish --dry-run` о «checked-in files are ignored by a .gitignore»:
-  - `pubspec.lock` убран из индекса git (library-convention — lockfile не коммитится);
-  - `.vscode/` убран из `.gitignore` (launch.json коммитится для команды), исключён из published package через новый `.pubignore`.
-- Lint `implementation_imports` в `example/lib/national_phone_demo_page.dart`: импорт переведён на публичный entry-point после экспорта `ACPhoneCountries`.
-
-### Notes
-
-- Существующие импорты `import 'package:appcraft_phone_util_flutter/ac_phone_util.dart';` продолжают работать.
-- Runtime-поведение библиотеки не изменено — только расширен публичный API и починены dev-окружение + publish-pipeline.
-
-## [1.1.1] - 2026-04-16
-
-### Added
-
-- `LICENSE` файл (MIT) в корне пакета — необходимое условие для публикации на pub.dev.
-- `lib/appcraft_phone_util_flutter.dart` — canonical entry-point, соответствующий имени пакета. Эквивалентен существующему `lib/ac_phone_util.dart` (re-export).
+- Dangling library doc comment in
+  `lib/src/presentation/ac_phone_presentation.dart` causing pub.dev
+  static analysis penalty (analyzer info `dangling_library_doc_comments`).
+  Resolved by adding an unnamed `library;` directive after the
+  doc-comment block.
+- `CHANGELOG.md` non-ASCII content causing the pub.dev
+  «Provide a valid CHANGELOG.md» score to drop to 0/5. All historical
+  entries translated to English (ASCII-only).
 
 ### Changed
 
-- `pubspec.yaml`: добавлены поля `repository`, `homepage`, `issue_tracker`, `topics`.
-- `pubspec.yaml`: `description` расширено — точно отражает функциональность пакета (parsing, validation, formatting, country detection, input masking).
-- `README.md`: инструкция установки через `flutter pub add` как primary; git-источник сохранён как secondary `## From source`.
+- `CHANGELOG.md` fully translated to English. Dates removed from
+  version headings: format is now `## [X.Y.Z]` instead of
+  `## [X.Y.Z] - YYYY-MM-DD`. Git log remains the source of truth
+  for release dates.
+- Minimum Dart SDK constraint bumped from `>=2.14.0` to `>=2.19.0`.
+  Required by the unnamed `library;` directive used to attach the
+  library-level doc comment in `ac_phone_presentation.dart`.
 
-### Notes
+### Internal
 
-- Существующие импорты `import 'package:appcraft_phone_util_flutter/ac_phone_util.dart';` продолжают работать без изменений — обратная совместимость гарантирована smoke-тестом `canonical_entry_point_test.dart`.
-- Runtime behavior не изменён — только metadata и структура publish artifact. Первая публикация на pub.dev.
+- Added `.github/workflows/publish.yml` for automated publishing
+  to pub.dev on git tag `v*` push. Uses OIDC authentication via the
+  reusable `dart-lang/setup-dart/.github/workflows/publish.yml@v1`
+  workflow; no long-lived `PUB_TOKEN` secret required. Pre-publish
+  steps run `dart analyze --fatal-infos --fatal-warnings` and
+  `flutter test`; the version in `pubspec.yaml` is verified to match
+  the pushed tag.
+- Added regression test `test/changelog_ascii_test.dart` enforcing
+  non-ASCII ratio < 5% in `CHANGELOG.md`. Prevents future
+  reintroduction of non-English content into the changelog.
 
-## [1.1.0] - 2026-04-16
+## [1.2.0]
 
 ### Added
 
-- Публичный контракт `ACPhoneInputFormatter`: явная гарантия digits-only
-  фильтрации — не-цифровые символы (буквы, emoji, пунктуация, unicode
-  whitespace) отбрасываются при вводе и вставке.
-  `FilteringTextInputFormatter.digitsOnly` больше не требуется рядом с
-  `ACPhoneInputFormatter`.
-
-### Changed
-
-- `ACPhoneEditingController`: при изменении `text` автоматически заменяет цифры trunk-prefix на цифры реального `phoneCode` детектированной страны. Например, ввод `89008007060` без форматтера даёт `text = '79008007060'` (country = RU); с `ACPhoneInputFormatter(mask: '+# (###) ###-##-##')` — `+7 (900) 800-70-60`. Замена хирургическая: трогает только первые N digit-символов (N = длина digits-версии `phoneCode`), сохраняет маску/разделители и позицию курсора по digit-count. Для номеров, где trunk-prefix уже совпадает с `phoneCode` (`+79...`, `+380...`), rewrite не вызывается. Маскирование по-прежнему целиком ответственность форматтера.
-- `example/lib/national_phone_demo_page.dart`: убрана избыточная
-  `FilteringTextInputFormatter.digitsOnly` из `inputFormatters` —
-  демонстрация упрощённой интеграции.
+- Exported `ACPhoneCountries` class from `ac_phone_util.dart` —
+  public access to the supported countries registry
+  (`ACPhoneCountries.instance.all`, `.instance.hashedCountries`).
+  Previously the class was only accessible through `lib/src/`.
 
 ### Fixed
 
-- `ACPhoneInputFormatter`: backspace на маска-разделителе (`(`, `)`, `-`, пробел) теперь удаляет предшествующую цифру — исправляет залипание редактирования отформатированных номеров.
-- `ACPhoneEditingController`: автоматическое удаление одинокого `+` при стирании последней цифры номера.
-- `ACPhoneInputFormatter`: обрезка trailing-разделителей после последней цифры — устраняет залипание при удалении (+7, +7 (900) и аналогичных партиальных состояниях).
+- Analyzer info `include_file_not_found` for
+  `package:flutter_lints/flutter.yaml` in `example/`: added
+  `flutter_lints: ^3.0.0` to `dev_dependencies` of
+  `example/pubspec.yaml`.
+- `dart pub publish --dry-run` warning «checked-in files are ignored
+  by a .gitignore»:
+  - `pubspec.lock` removed from git index (library convention —
+    lockfile is not committed);
+  - `.vscode/` removed from `.gitignore` (launch.json is committed
+    for the team), excluded from the published package via the
+    new `.pubignore`.
+- Lint `implementation_imports` in
+  `example/lib/national_phone_demo_page.dart`: import switched to
+  the public entry-point after `ACPhoneCountries` was exported.
+
+### Notes
+
+- Existing imports
+  `import 'package:appcraft_phone_util_flutter/ac_phone_util.dart';`
+  continue to work.
+- Library runtime behavior is unchanged — only the public API is
+  extended and the dev environment + publish pipeline are fixed.
+
+## [1.1.1]
+
+### Added
+
+- `LICENSE` file (MIT) at the package root — required for
+  publication on pub.dev.
+- `lib/appcraft_phone_util_flutter.dart` — canonical entry-point
+  matching the package name. Equivalent to the existing
+  `lib/ac_phone_util.dart` (re-export).
+
+### Changed
+
+- `pubspec.yaml`: added `repository`, `homepage`, `issue_tracker`,
+  `topics` fields.
+- `pubspec.yaml`: `description` expanded — accurately reflects the
+  package functionality (parsing, validation, formatting, country
+  detection, input masking).
+- `README.md`: installation via `flutter pub add` is now the primary
+  instruction; the git source is kept as secondary `## From source`.
+
+### Notes
+
+- Existing imports
+  `import 'package:appcraft_phone_util_flutter/ac_phone_util.dart';`
+  continue to work without changes — backward compatibility is
+  guaranteed by the smoke test `canonical_entry_point_test.dart`.
+- Runtime behavior is unchanged — only metadata and the publish
+  artifact structure. First publication on pub.dev.
+
+## [1.1.0]
+
+### Added
+
+- Public contract for `ACPhoneInputFormatter`: explicit digits-only
+  filtering guarantee — non-digit characters (letters, emoji,
+  punctuation, unicode whitespace) are dropped on input and paste.
+  `FilteringTextInputFormatter.digitsOnly` is no longer required
+  alongside `ACPhoneInputFormatter`.
+
+### Changed
+
+- `ACPhoneEditingController`: when `text` changes, automatically
+  replaces the trunk-prefix digits with the digits of the actual
+  `phoneCode` of the detected country. For example, entering
+  `89008007060` without a formatter produces `text = '79008007060'`
+  (country = RU); with
+  `ACPhoneInputFormatter(mask: '+# (###) ###-##-##')` —
+  `+7 (900) 800-70-60`. The replacement is surgical: it touches
+  only the first N digit characters (N = length of the digits
+  version of `phoneCode`), preserves the mask/separators and the
+  cursor position by digit-count. For numbers where the
+  trunk-prefix already matches `phoneCode` (`+79...`, `+380...`),
+  the rewrite is not invoked. Masking remains entirely the
+  responsibility of the formatter.
+- `example/lib/national_phone_demo_page.dart`: removed redundant
+  `FilteringTextInputFormatter.digitsOnly` from `inputFormatters` —
+  demonstrates simplified integration.
+
+### Fixed
+
+- `ACPhoneInputFormatter`: backspace on a mask separator (`(`, `)`,
+  `-`, space) now removes the preceding digit — fixes editing
+  stalls on formatted numbers.
+- `ACPhoneEditingController`: automatic removal of a lone `+` when
+  the last digit of the number is erased.
+- `ACPhoneInputFormatter`: trimming of trailing separators after
+  the last digit — eliminates stalls when deleting (+7, +7 (900)
+  and similar partial states).
 
 ### Refactored
 
-- `ACPhoneEditingController`: замена `_isRewriting` на `_lastText` — memo-guard + экономия `findPhone` при изменении только selection.
+- `ACPhoneEditingController`: `_isRewriting` replaced with
+  `_lastText` — memo-guard plus saving on `findPhone` when only
+  the selection changes.
 
-## [1.0.0] - 2026-04-14
+## [1.0.0]
 
 ### BREAKING CHANGES
 
-- `ACPhoneInputFormatter`: параметры `country` и `onPhoneChanged` удалены. Форматтер теперь принимает один обязательный параметр `mask: String`. Авто-определение страны больше не встроено в форматтер — используйте `ACPhoneEditingController` (auto-detect) или `ACNationalPhoneEditingController` (с явной страной).
-- `ACPhoneCountry.telMask` переименован в `nationalMask`. Поведение изменено: скобки и дефисы теперь сохраняются. Для старого поведения (без скобок и дефисов) используйте новый `rawNationalMask`.
+- `ACPhoneInputFormatter`: parameters `country` and
+  `onPhoneChanged` removed. The formatter now takes a single
+  required parameter `mask: String`. Auto-detection of the country
+  is no longer built into the formatter — use
+  `ACPhoneEditingController` (auto-detect) or
+  `ACNationalPhoneEditingController` (with an explicit country).
+- `ACPhoneCountry.telMask` renamed to `nationalMask`. Behavior
+  changed: parentheses and dashes are now preserved. For the old
+  behavior (without parentheses and dashes) use the new
+  `rawNationalMask`.
 
 ### Added
 
-- `ACPhoneCountry.rawMask` — полная маска без `(`, `)`, `-`; разделитель — только пробел.
-- `ACPhoneCountry.rawNationalMask` — национальная маска без `(`, `)`, `-`.
-- `ACNationalPhoneEditingController` — контроллер ввода национальной части номера с внешне задаваемой страной (`country` через конструктор и сеттер). `rawPhoneNumber` возвращает полный номер, `isValid` валидирует через `ACPhoneUtil`.
-- Пример приложения обновлён: две отдельные демо-страницы (`auto_detect_demo_page.dart`, `national_phone_demo_page.dart`) с навигацией из главного экрана.
+- `ACPhoneCountry.rawMask` — full mask without `(`, `)`, `-`;
+  separator is space only.
+- `ACPhoneCountry.rawNationalMask` — national mask without `(`,
+  `)`, `-`.
+- `ACNationalPhoneEditingController` — input controller for the
+  national part of the number with an externally provided country
+  (`country` via constructor and setter). `rawPhoneNumber` returns
+  the full number, `isValid` validates via `ACPhoneUtil`.
+- Example application updated: two separate demo pages
+  (`auto_detect_demo_page.dart`, `national_phone_demo_page.dart`)
+  with navigation from the home screen.
 
 ### Migration
 
@@ -91,14 +187,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 // BEFORE (0.0.1)
 ACPhoneInputFormatter(country: country, onPhoneChanged: (d) => ...);
 
-// AFTER (1.0.0) — полный номер
+// AFTER (1.0.0) — full number
 ACPhoneInputFormatter(mask: country.mask);
 
-// AFTER — только национальная часть
+// AFTER — national part only
 ACPhoneInputFormatter(mask: country.nationalMask);
 ```
 
-## [0.0.1] - 2026-04-07
+## [0.0.1]
 
 ### Added
 
