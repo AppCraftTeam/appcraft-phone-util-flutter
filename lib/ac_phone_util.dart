@@ -6,7 +6,7 @@
 /// registry of supported countries, [ACPhoneData] for parsed results,
 /// [ACPhoneMasked] for mask application, and
 /// [ACPhoneCountryLocalizations] for localized country names.
-library ac_phone_util;
+library;
 
 export 'src/data/ac_phone_countries.dart';
 export 'src/data/ac_phone_country_localizations.dart';

@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- CI workflow `.github/workflows/ci.yml` on pull requests and pushes
+  to `main`: `dart analyze --fatal-infos --fatal-warnings`,
+  `flutter test --coverage` with a 70% line coverage threshold for
+  `lib/`, and `dart pub publish --dry-run`.
+- `analysis_options.yaml` with `flutter_lints`.
+
+### Changed
+
+- Entry-point libraries `lib/ac_phone_util.dart` and
+  `lib/appcraft_phone_util_flutter.dart` use unnamed `library;`
+  directives (no public API change).
+
+### Removed
+
+- Automatic publishing workflow `.github/workflows/publish.yml`;
+  publishing to pub.dev is manual (`dart pub publish`).
+
 ## [1.2.2]
 
 ### Fixed

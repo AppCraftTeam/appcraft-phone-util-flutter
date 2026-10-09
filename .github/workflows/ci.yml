@@ -1,0 +1,68 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    name: Analyze, test, dry-run publish
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Dependencies
+        run: flutter pub get
+
+      - name: Analyze
+        run: dart analyze --fatal-infos --fatal-warnings
+
+      - name: Test
+        run: flutter test --coverage
+
+      - name: Coverage threshold
+        env:
+          MIN_COVERAGE: 70
+        run: |
+          LCOV=coverage/lcov.info
+          if [ ! -f "$LCOV" ]; then
+            echo "::error::Coverage report $LCOV not found"
+            exit 1
+          fi
+          awk -v min="$MIN_COVERAGE" '
+            /^SF:/ { in_lib = (substr($0, 4, 4) == "lib/") }
+            in_lib && /^LF:/ { lf += substr($0, 4) }
+            in_lib && /^LH:/ { lh += substr($0, 4) }
+            END {
+              if (lf == 0) {
+                print "::error::No lib/ lines found in coverage report"
+                exit 1
+              }
+              pct = lh * 100 / lf
+              line = sprintf("Coverage lib/: %.2f%% (%d/%d), threshold %s%%", pct, lh, lf, min)
+              if (pct < min) {
+                print "::error::" line
+                exit 1
+              }
+              print line
+            }
+          ' "$LCOV"
+
+      - name: Publish dry-run
+        run: dart pub publish --dry-run
