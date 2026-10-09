@@ -8,6 +8,6 @@
 /// // or, equivalently:
 /// import 'package:appcraft_phone_util_flutter/ac_phone_util.dart';
 /// ```
-library appcraft_phone_util_flutter;
+library;
 
 export 'ac_phone_util.dart';
